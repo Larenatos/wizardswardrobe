@@ -70,8 +70,17 @@ function WWG.CreateWarningControl(name, parentControl)
   return warning
 end
 
-function WWG.SetupQuitWarning()
+function WWG.SetupExitWarning()
   local menu = WINDOW_MANAGER:GetControlByName("ZO_GameMenu_InGame").gameMenu
+
+  if not WW.settings.showExitWarnings then
+    menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(true)
+    menu.navigationTree.rootNode.children[7].control:SetMouseEnabled(true)
+    LOGOUT_WARNING:SetHidden(true)
+    QUIT_WARNING:SetHidden(true)
+    return
+  end
+
 
   if LOGOUT_WARNING == nil and QUIT_WARNING == nil then
     LOGOUT_WARNING = WWG.CreateWarningControl("LogoutWarning", menu.navigationTree.rootNode.children[6].control)
@@ -172,7 +181,7 @@ function WWG.SetSceneManagement()
 
 		if sceneName == "gameMenuInGame" then
       if newState == SCENE_SHOWN then
-        WWG.SetupQuitWarning()
+        WWG.SetupExitWarning()
       else
         return
       end

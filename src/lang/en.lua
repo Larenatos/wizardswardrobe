@@ -80,6 +80,8 @@ local language = {
 	WW_MENU_INVENTORYMARKER_TT = "Shows a small icon over items in the inventory that are saved in setups.",
 	WW_MENU_LOCKSAVEDGEAR = "Lock saved gear",
 	WW_MENU_LOCKSAVEDGEAR_TT = "Automatically locks gear when saved to a setup.",
+  WW_MENU_SHOWEXITWARNINGS = "Show log out and quit warning",
+  WW_MENU_SHOWEXITWARNINGS_TT = "Warn when a character has gear that is saved in setups on other characters.",
 	WW_MENU_UNEQUIPEMPTY = "Unequip empty slots",
 	WW_MENU_UNEQUIPEMPTY_TT =
 	"If something is saved as empty in the setup, the item/champion point/skill will be unequipped.",
