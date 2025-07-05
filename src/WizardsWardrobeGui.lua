@@ -24,6 +24,9 @@ local DIVIDER_HEIGHT = 2
 local SETUP_BOX_WIDTH = 350
 local SETUP_BOX_HEIGHT = 128
 
+local LOGOUT_WARNING
+local QUIT_WARNING
+
 function WWG.Init()
 	WWG.name = WW.name .. "Gui"
 	WWG.setupTable = {}
@@ -46,6 +49,38 @@ function WWG.Init()
 	WWG.RegisterEvents()
 	WWG.tree:Initialize()
 	zo_callLater( function() WWG.OnWindowResize( "stop" ) end, 250 )
+end
+
+function WWG.CreateWarningControl(name, parentControl)
+  local warning = CreateControl(name, parentControl, CT_TEXTURE)
+  warning:SetResizeToFitFile(true)
+  warning:SetTexture("/esoui/art/miscellaneous/eso_icon_warning.dds")
+  warning:SetAnchor(LEFT, parentControl , RIGHT)
+  warning:SetMouseEnabled(true)
+
+  warning:SetHandler("OnMouseEnter", function()
+      InitializeTooltip(InformationTooltip, warning, BOTTOMLEFT, 0, 0, TOPLEFT)
+      SetTooltipText(InformationTooltip, ZO_ERROR_COLOR:Colorize("You have gear in this character's inventory that is saved in other character's Wizard's setups. Click to continue anyways"))
+  end)
+  warning:SetHandler("OnMouseExit", function()
+    ClearTooltip(InformationTooltip)
+  end)
+  warning:SetHandler("OnMouseDown", parentControl.callback)
+
+  return warning
+end
+
+function WWG.SetupQuitWarning()
+  local menu = WINDOW_MANAGER:GetControlByName("ZO_GameMenu_InGame").gameMenu
+  menu.navigationTree.rootNode.children[6].control:SetColor(255,0,0,1)
+  menu.navigationTree.rootNode.children[7].control:SetColor(255,0,0,1)
+  if LOGOUT_WARNING == nil and QUIT_WARNING == nil then
+    menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(false)
+    menu.navigationTree.rootNode.children[7].control:SetMouseEnabled(false)
+
+    LOGOUT_WARNING = WWG.CreateWarningControl("LogoutWarning", menu.navigationTree.rootNode.children[6].control)
+    QUIT_WARNING = WWG.CreateWarningControl("QuitWarning", menu.navigationTree.rootNode.children[7].control)
+  end
 end
 
 function WWG.RegisterEvents()
@@ -124,7 +159,14 @@ function WWG.SetSceneManagement()
 	local onSceneChange = function( scene, oldState, newState )
 		local sceneName = scene:GetName()
 
-		if sceneName == "gameMenuInGame" then return end
+		if sceneName == "gameMenuInGame" then
+      if newState == SCENE_SHOWN then
+        WWG.SetupQuitWarning()
+      else
+        return
+      end
+    end
+      
 
 		if newState == SCENE_SHOWING then
 			local savedScene = WW.settings.window[ sceneName ]
