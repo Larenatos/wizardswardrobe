@@ -72,14 +72,25 @@ end
 
 function WWG.SetupQuitWarning()
   local menu = WINDOW_MANAGER:GetControlByName("ZO_GameMenu_InGame").gameMenu
-  menu.navigationTree.rootNode.children[6].control:SetColor(255,0,0,1)
-  menu.navigationTree.rootNode.children[7].control:SetColor(255,0,0,1)
-  if LOGOUT_WARNING == nil and QUIT_WARNING == nil then
-    menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(false)
-    menu.navigationTree.rootNode.children[7].control:SetMouseEnabled(false)
 
+  if LOGOUT_WARNING == nil and QUIT_WARNING == nil then
     LOGOUT_WARNING = WWG.CreateWarningControl("LogoutWarning", menu.navigationTree.rootNode.children[6].control)
     QUIT_WARNING = WWG.CreateWarningControl("QuitWarning", menu.navigationTree.rootNode.children[7].control)
+  end
+
+  local accountWideSavedGear = WW.banking.GetAccountSavedGear()
+  if next(accountWideSavedGear) ~= nil then
+    menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(false)
+    menu.navigationTree.rootNode.children[6].control:SetColor(255,0,0,1)
+    menu.navigationTree.rootNode.children[7].control:SetMouseEnabled(false)
+    menu.navigationTree.rootNode.children[7].control:SetColor(255,0,0,1)
+    LOGOUT_WARNING:SetHidden(false)
+    QUIT_WARNING:SetHidden(false)
+  else
+    menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(true)
+    menu.navigationTree.rootNode.children[7].control:SetMouseEnabled(true)
+    LOGOUT_WARNING:SetHidden(true)
+    QUIT_WARNING:SetHidden(true)
   end
 end
 
