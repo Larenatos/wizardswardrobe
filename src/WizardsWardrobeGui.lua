@@ -87,7 +87,7 @@ function WWG.SetupExitWarning()
     QUIT_WARNING = WWG.CreateWarningControl("QuitWarning", menu.navigationTree.rootNode.children[7].control)
   end
 
-  local accountWideSavedGear = WW.banking.GetAccountSavedGear()
+  local accountWideSavedGear = WW.banking.GetAccountSavedGear(true)
   if next(accountWideSavedGear) ~= nil then
     menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(false)
     menu.navigationTree.rootNode.children[6].control:SetColor(255,0,0,1)
