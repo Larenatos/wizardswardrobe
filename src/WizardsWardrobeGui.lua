@@ -24,9 +24,6 @@ local DIVIDER_HEIGHT = 2
 local SETUP_BOX_WIDTH = 350
 local SETUP_BOX_HEIGHT = 128
 
-local LOGOUT_WARNING
-local QUIT_WARNING
-
 function WWG.Init()
 	WWG.name = WW.name .. "Gui"
 	WWG.setupTable = {}
@@ -51,55 +48,37 @@ function WWG.Init()
 	zo_callLater( function() WWG.OnWindowResize( "stop" ) end, 250 )
 end
 
-function WWG.CreateWarningControl(name, parentControl)
-  local warning = CreateControl(name, parentControl, CT_TEXTURE)
-  warning:SetResizeToFitFile(true)
-  warning:SetTexture("/esoui/art/miscellaneous/eso_icon_warning.dds")
-  warning:SetAnchor(LEFT, parentControl , RIGHT)
-  warning:SetMouseEnabled(true)
-
-  warning:SetHandler("OnMouseEnter", function()
-      InitializeTooltip(InformationTooltip, warning, BOTTOMLEFT, 0, 0, TOPLEFT)
-      SetTooltipText(InformationTooltip, ZO_ERROR_COLOR:Colorize("You have gear in this character's inventory that is saved in other character's Wizard's setups. Click to continue anyways"))
-  end)
-  warning:SetHandler("OnMouseExit", function()
-    ClearTooltip(InformationTooltip)
-  end)
-  warning:SetHandler("OnMouseDown", parentControl.callback)
-
-  return warning
-end
-
 function WWG.SetupExitWarning()
   local menu = WINDOW_MANAGER:GetControlByName("ZO_GameMenu_InGame").gameMenu
+  local logoutControl = menu.navigationTree.rootNode.children[6].control
+  local quitControl = menu.navigationTree.rootNode.children[7].control
 
   if not WW.settings.showExitWarnings then
-    menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(true)
-    menu.navigationTree.rootNode.children[7].control:SetMouseEnabled(true)
-    LOGOUT_WARNING:SetHidden(true)
-    QUIT_WARNING:SetHidden(true)
+    logoutControl:SetMouseEnabled(true)
+    quitControl:SetMouseEnabled(true)
+    WizardsWardrobeLogoutWarning:SetHidden(true)
+    WizardsWardrobeQuitWarning:SetHidden(true)
     return
   end
 
-
-  if LOGOUT_WARNING == nil and QUIT_WARNING == nil then
-    LOGOUT_WARNING = WWG.CreateWarningControl("LogoutWarning", menu.navigationTree.rootNode.children[6].control)
-    QUIT_WARNING = WWG.CreateWarningControl("QuitWarning", menu.navigationTree.rootNode.children[7].control)
+  if WizardsWardrobeLogoutWarning == nil and WizardsWardrobeQuitWarning == nil then
+    WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeLogoutWarning", logoutControl, "WizardsWardrobeWarning")
+    WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeQuitWarning", quitControl, "WizardsWardrobeWarning")
   end
 
   local accountWideSavedGear = WW.banking.GetAccountSavedGear(true)
   if next(accountWideSavedGear) ~= nil then
-    menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(false)
-    menu.navigationTree.rootNode.children[6].control:SetColor(255,0,0,1)
-    menu.navigationTree.rootNode.children[7].control:SetMouseEnabled(false)
-    menu.navigationTree.rootNode.children[7].control:SetColor(255,0,0,1)
-    LOGOUT_WARNING:SetHidden(false)
-    QUIT_WARNING:SetHidden(false)
+    logoutControl:SetMouseEnabled(false)
+    logoutControl:SetColor(255,0,0,1)
+    quitControl:SetMouseEnabled(false)
+    quitControl:SetColor(255,0,0,1)
+    WizardsWardrobeLogoutWarning:SetHidden(false)
+    WizardsWardrobeQuitWarning:SetHidden(false)
   else
-    menu.navigationTree.rootNode.children[6].control:SetMouseEnabled(true)
-    menu.navigationTree.rootNode.children[7].control:SetMouseEnabled(true)
-    LOGOUT_WARNING:SetHidden(true)
-    QUIT_WARNING:SetHidden(true)
+    logoutControl:SetMouseEnabled(true)
+    quitControl:SetMouseEnabled(true)
+    WizardsWardrobeLogoutWarning:SetHidden(true)
+    WizardsWardrobeQuitWarning:SetHidden(true)
   end
 end
 

@@ -445,5 +445,15 @@
 			<OnInitialized>WW_IconHeader_OnInitialized( self )</OnInitialized>
 		</Control>
 
+    <Texture name="WizardsWardrobeWarning" virtual="true" textureFile="/esoui/art/miscellaneous/eso_icon_warning.dds" resizeToFitFile="true" mouseEnabled="true">
+      <Anchor point="LEFT" relativeTo="$(parent)" relativePoint="RIGHT"/>
+      <OnMouseEnter>
+        InitializeTooltip(InformationTooltip, self, BOTTOMLEFT, 0, 0, TOPLEFT) 
+        SetTooltipText(InformationTooltip, ZO_ERROR_COLOR:Colorize(GetString( WW_BUTTON_EXITWARNING_TT )))
+      </OnMouseEnter>
+      <OnMouseExit>ClearTooltip(InformationTooltip)</OnMouseExit>
+      <OnMouseDown>self:GetParent().callback()</OnMouseDown>
+    </Texture>
+
 	</Controls>
 </GuiXml>
