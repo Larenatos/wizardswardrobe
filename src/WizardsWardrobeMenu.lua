@@ -89,13 +89,13 @@ function WWM.InitSV()
 		autoSelectInstance = true,
 		autoSelectGeneral = false,
 		lockSavedGear = true,
-    showExitWarnings = true,
-    accountWideStorage = {
-      setups = {},
-      pages = {},
-      prebuffs = {},
-      autoEquipSetups = true,
-      selectedZoneTag = 'GEN',
+		showExitWarnings = true,
+		accountWideStorage = {
+			setups = {},
+			pages = {},
+			prebuffs = {},
+			autoEquipSetups = true,
+			selectedZoneTag = 'GEN',
     }
 	} )
 
