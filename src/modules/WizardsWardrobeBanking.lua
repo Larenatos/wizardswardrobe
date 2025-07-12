@@ -117,14 +117,13 @@ function WWB.DepositSetup(zone, pageId, index)
 end
 
 function WWB.GetAccountSavedGear(skipCurrentCharacter)
-  local itemLocationTable = WW.GetItemLocation()
+	local itemLocationTable = WW.GetItemLocation()
 	local preGearTable = {}
 
 	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
 		if (skipCurrentCharacter and characterSv["$LastCharacterName"] ~= GetUnitName("player")) and characterId ~= "$AccountWide" then
-      for zoneTag, setupPages in pairs(characterSv.setups) do
+			for zoneTag, setupPages in pairs(characterSv.setups) do
 				for pageId, setups in pairs(setupPages) do
-					
 					for _, setup in ipairs( setups ) do
 						if setup.gear then
 							for __, gearSlot in ipairs(WW.GEARSLOTS) do
@@ -148,8 +147,7 @@ function WWB.GetAccountSavedGear(skipCurrentCharacter)
 			end
 		end
 	end
-
-  return preGearTable
+	return preGearTable
 end
 
 function WWB.DepositAllSetups()
