@@ -50,8 +50,16 @@ end
 
 function WWG.SetupExitWarning()
 	local menu = WINDOW_MANAGER:GetControlByName("ZO_GameMenu_InGame").gameMenu
-	local logoutControl = menu.navigationTree.rootNode.children[6].control
-	local quitControl = menu.navigationTree.rootNode.children[7].control
+	local logoutControl
+	local quitControl
+
+	for i, children in ipairs(menu.navigationTree.rootNode.children) do
+		if children.control:GetText() == string.upper(GetString(SI_GAME_MENU_LOGOUT)) then
+			logoutControl = children.control
+		elseif children.control:GetText() == string.upper(GetString(SI_GAME_MENU_QUIT)) then
+			quitControl = children.control
+		end
+	end
 
 	if not WW.settings.showExitWarnings then
 		logoutControl:SetMouseEnabled(true)
@@ -65,7 +73,7 @@ function WWG.SetupExitWarning()
 		WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeLogoutWarning", logoutControl, "WizardsWardrobeWarning")
 		WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeQuitWarning", quitControl, "WizardsWardrobeWarning")
 	end
-	local accountWideSavedGear = WW.banking.GetAccountSavedGear(true)
+	local accountWideSavedGear = WW.banking.GetAccountSavedGearInventory(true)
 	if next(accountWideSavedGear) ~= nil then
 		logoutControl:SetMouseEnabled(false)
 		logoutControl:SetColor(255,0,0,1)
