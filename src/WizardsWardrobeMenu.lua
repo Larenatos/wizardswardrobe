@@ -88,7 +88,15 @@ function WWM.InitSV()
 		legacyZoneSelection = false,
 		autoSelectInstance = true,
 		autoSelectGeneral = false,
-		lockSavedGear = true
+		lockSavedGear = true,
+    showExitWarnings = true,
+    accountWideStorage = {
+      setups = {},
+      pages = {},
+      prebuffs = {},
+      autoEquipSetups = true,
+      selectedZoneTag = 'GEN',
+    }
 	} )
 
 	-- migrate validation settings

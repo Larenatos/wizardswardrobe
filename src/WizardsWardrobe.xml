@@ -69,10 +69,19 @@
 						</Button>
 					</Controls>
 				</Control>
+        <Control name="$(parent)CharacterMenu">
+          <Dimensions x="FLEX_ALIGNMENT_AUTO" y="40" />
+          <Anchor point="TOP" relativeTo="$(parent)Title" relativePoint="BOTTOM" />
+          <Controls>
+            <Control name="$(parent)CharactersDropdown" inherits="ZO_ComboBoxResizeToFit" mouseEnabled="true">
+              <DimensionConstraints minX="140" maxY="29" />
+              <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" />
+            </Control>
+          </Controls>
+        </Control>
 				<Control name="$(parent)TopMenu">
 					<Dimensions x="340" y="75" />
-
-					<Anchor point="TOP" relativeTo="$(parent)Title" relativePoint="BOTTOM" />
+					<Anchor point="TOP" relativeTo="$(parent)CharacterMenu" relativePoint="BOTTOM" />
 					<Controls>
 						<Control name="$(parent)Buttons">
 							<Dimensions x="FLEX_ALIGNMENT_AUTO" y="36" />
