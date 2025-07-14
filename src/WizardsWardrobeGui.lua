@@ -48,47 +48,6 @@ function WWG.Init()
 	zo_callLater( function() WWG.OnWindowResize( "stop" ) end, 250 )
 end
 
-function WWG.SetupExitWarning()
-	local menu = WINDOW_MANAGER:GetControlByName("ZO_GameMenu_InGame").gameMenu
-	local logoutControl
-	local quitControl
-
-	for i, children in ipairs(menu.navigationTree.rootNode.children) do
-		if children.control:GetText() == string.upper(GetString(SI_GAME_MENU_LOGOUT)) then
-			logoutControl = children.control
-		elseif children.control:GetText() == string.upper(GetString(SI_GAME_MENU_QUIT)) then
-			quitControl = children.control
-		end
-	end
-
-	if not WW.settings.showExitWarnings then
-		logoutControl:SetMouseEnabled(true)
-		quitControl:SetMouseEnabled(true)
-		WizardsWardrobeLogoutWarning:SetHidden(true)
-		WizardsWardrobeQuitWarning:SetHidden(true)
-		return
-	end
-
-	if WizardsWardrobeLogoutWarning == nil and WizardsWardrobeQuitWarning == nil then
-		WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeLogoutWarning", logoutControl, "WizardsWardrobeWarning")
-		WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeQuitWarning", quitControl, "WizardsWardrobeWarning")
-	end
-	local accountWideSavedGear = WW.banking.GetAccountSavedGearInInventory(true)
-	if next(accountWideSavedGear) ~= nil then
-		logoutControl:SetMouseEnabled(false)
-		logoutControl:SetColor(255,0,0,1)
-		quitControl:SetMouseEnabled(false)
-		quitControl:SetColor(255,0,0,1)
-		WizardsWardrobeLogoutWarning:SetHidden(false)
-		WizardsWardrobeQuitWarning:SetHidden(false)
-	else
-		logoutControl:SetMouseEnabled(true)
-		quitControl:SetMouseEnabled(true)
-		WizardsWardrobeLogoutWarning:SetHidden(true)
-		WizardsWardrobeQuitWarning:SetHidden(true)
-	end
-end
-
 function WWG.RegisterEvents()
 	EVENT_MANAGER:RegisterForEvent( WWG.name, EVENT_PLAYER_DEAD, function() WizardsWardrobePanel.fragment:Refresh() end )
 	EVENT_MANAGER:RegisterForEvent( WWG.name, EVENT_PLAYER_ALIVE, function() WizardsWardrobePanel.fragment:Refresh() end )
@@ -166,7 +125,7 @@ function WWG.SetSceneManagement()
 		local sceneName = scene:GetName()
 
 		if sceneName == "gameMenuInGame" then
-			if newState == SCENE_SHOWN then WWG.SetupExitWarning()
+			if newState == SCENE_SHOWN then WWG.ShowExitWarning()
 			else return end
 		end
 				
@@ -1939,4 +1898,45 @@ function WWG.StartAlphaAnimation( control, duration, startAlpha, endAlpha )
 		timeline:PlayFromStart()
 	end
 	return animation, timeline
+end
+
+function WWG.ShowExitWarning()
+	local menu = WINDOW_MANAGER:GetControlByName("ZO_GameMenu_InGame").gameMenu
+	local logoutControl
+	local quitControl
+
+	for i, children in ipairs(menu.navigationTree.rootNode.children) do
+		if children.control:GetText() == string.upper(GetString(SI_GAME_MENU_LOGOUT)) then
+			logoutControl = children.control
+		elseif children.control:GetText() == string.upper(GetString(SI_GAME_MENU_QUIT)) then
+			quitControl = children.control
+		end
+	end
+
+	if not WW.settings.showExitWarnings then
+		logoutControl:SetMouseEnabled(true)
+		quitControl:SetMouseEnabled(true)
+		WizardsWardrobeLogoutWarning:SetHidden(true)
+		WizardsWardrobeQuitWarning:SetHidden(true)
+		return
+	end
+
+	if WizardsWardrobeLogoutWarning == nil and WizardsWardrobeQuitWarning == nil then
+		WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeLogoutWarning", logoutControl, "WizardsWardrobeWarning")
+		WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeQuitWarning", quitControl, "WizardsWardrobeWarning")
+	end
+	local accountWideSavedGear = WW.banking.GetAccountSavedGearInInventory(true)
+	if next(accountWideSavedGear) ~= nil then
+		logoutControl:SetMouseEnabled(false)
+		logoutControl:SetColor(255,0,0,1)
+		quitControl:SetMouseEnabled(false)
+		quitControl:SetColor(255,0,0,1)
+		WizardsWardrobeLogoutWarning:SetHidden(false)
+		WizardsWardrobeQuitWarning:SetHidden(false)
+	else
+		logoutControl:SetMouseEnabled(true)
+		quitControl:SetMouseEnabled(true)
+		WizardsWardrobeLogoutWarning:SetHidden(true)
+		WizardsWardrobeQuitWarning:SetHidden(true)
+	end
 end
