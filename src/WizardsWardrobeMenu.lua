@@ -96,7 +96,8 @@ function WWM.InitSV()
 			prebuffs = {},
 			autoEquipSetups = true,
 			selectedZoneTag = 'GEN',
-    }
+    },
+		selectedCharacterId = nil,
 	} )
 
 	-- migrate validation settings

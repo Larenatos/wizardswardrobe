@@ -74,7 +74,6 @@
 					<Anchor point="TOP" relativeTo="$(parent)Title" relativePoint="BOTTOM" />
 					<Controls>
 						<Control name="$(parent)CharactersDropdown" inherits="ZO_ComboBoxResizeToFit" mouseEnabled="true">
-							<DimensionConstraints minX="140" maxY="29" />
 							<Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" />
 						</Control>
 					</Controls>
