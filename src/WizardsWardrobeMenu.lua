@@ -89,7 +89,7 @@ function WWM.InitSV()
 		autoSelectInstance = true,
 		autoSelectGeneral = false,
 		lockSavedGear = true,
-		showExitWarnings = true,
+		showExitWarnings = false,
 	} )
 
 	-- migrate validation settings
