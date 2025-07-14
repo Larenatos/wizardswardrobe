@@ -73,7 +73,7 @@ function WWG.SetupExitWarning()
 		WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeLogoutWarning", logoutControl, "WizardsWardrobeWarning")
 		WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeQuitWarning", quitControl, "WizardsWardrobeWarning")
 	end
-	local accountWideSavedGear = WW.banking.GetAccountSavedGearInventory(true)
+	local accountWideSavedGear = WW.banking.GetAccountSavedGearInInventory(true)
 	if next(accountWideSavedGear) ~= nil then
 		logoutControl:SetMouseEnabled(false)
 		logoutControl:SetColor(255,0,0,1)
@@ -163,44 +163,44 @@ end
 
 function WWG.SetSceneManagement()
 	local onSceneChange = function( scene, oldState, newState )
-	local sceneName = scene:GetName()
+		local sceneName = scene:GetName()
 
-	if sceneName == "gameMenuInGame" then
-		if newState == SCENE_SHOWN then WWG.SetupExitWarning()
-		else return end
-	end
-      
+		if sceneName == "gameMenuInGame" then
+			if newState == SCENE_SHOWN then WWG.SetupExitWarning()
+			else return end
+		end
+				
 
-	if newState == SCENE_SHOWING then
-		local savedScene = WW.settings.window[ sceneName ]
-		if savedScene then
-			if not savedScene.hidden then
-				WizardsWardrobeWindow:ClearAnchors()
-				WizardsWardrobeWindow:SetAnchor( TOPLEFT, GuiRoot, TOPLEFT, savedScene.left, savedScene.top )
-				--WWG.StartAlphaAnimation( WizardsWardrobeWindow, 50, 0, 1 )
-				WizardsWardrobeWindow:SetHidden( false )
+		if newState == SCENE_SHOWING then
+			local savedScene = WW.settings.window[ sceneName ]
+			if savedScene then
+				if not savedScene.hidden then
+					WizardsWardrobeWindow:ClearAnchors()
+					WizardsWardrobeWindow:SetAnchor( TOPLEFT, GuiRoot, TOPLEFT, savedScene.left, savedScene.top )
+					--WWG.StartAlphaAnimation( WizardsWardrobeWindow, 50, 0, 1 )
+					WizardsWardrobeWindow:SetHidden( false )
+				end
 			end
 		end
-	end
 
-	-- looks better when window hides faster
-	if newState == SCENE_HIDING then
-		local savedScene = WW.settings.window[ sceneName ]
-		if savedScene then
-			--WWG.StartAlphaAnimation( WizardsWardrobeWindow, 50, 1, 0 )
-			WizardsWardrobeWindow:SetHidden( true )
-		end
-		if sceneName == "hud" or sceneName == "hudui" then
-			if not WW.settings.window[ sceneName ] then
-				WW.settings.window[ sceneName ] = {
-					top = WizardsWardrobeWindow:GetTop(),
-					left = WizardsWardrobeWindow:GetLeft(),
-					hidden = true,
-				}
+		-- looks better when window hides faster
+		if newState == SCENE_HIDING then
+			local savedScene = WW.settings.window[ sceneName ]
+			if savedScene then
+				--WWG.StartAlphaAnimation( WizardsWardrobeWindow, 50, 1, 0 )
+				WizardsWardrobeWindow:SetHidden( true )
 			end
-			WW.settings.window[ sceneName ].hidden = true
+			if sceneName == "hud" or sceneName == "hudui" then
+				if not WW.settings.window[ sceneName ] then
+					WW.settings.window[ sceneName ] = {
+						top = WizardsWardrobeWindow:GetTop(),
+						left = WizardsWardrobeWindow:GetLeft(),
+						hidden = true,
+					}
+				end
+				WW.settings.window[ sceneName ].hidden = true
+			end
 		end
-	end
 	end
 	SCENE_MANAGER:RegisterCallback( "SceneStateChanged", onSceneChange )
 

@@ -81,7 +81,7 @@ local language = {
 	WW_MENU_LOCKSAVEDGEAR = "Lock saved gear",
 	WW_MENU_LOCKSAVEDGEAR_TT = "Automatically locks gear when saved to a setup.",
   WW_MENU_SHOWEXITWARNINGS = "Show log out and quit warning",
-  WW_MENU_SHOWEXITWARNINGS_TT = "Warn when a character has gear that is saved in setups on other characters.",
+  WW_MENU_SHOWEXITWARNINGS_TT = "Show a warning icon next to Logout and Quit when there is gear in the current characters inventory which are used for setups on other characters setups. Requires now to click the warning icon instead the text to log out and quit.",
 	WW_MENU_UNEQUIPEMPTY = "Unequip empty slots",
 	WW_MENU_UNEQUIPEMPTY_TT =
 	"If something is saved as empty in the setup, the item/champion point/skill will be unequipped.",

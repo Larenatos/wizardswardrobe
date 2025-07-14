@@ -116,7 +116,7 @@ function WWB.DepositSetup(zone, pageId, index)
 	WWB.MoveItems(gearTable, bankBag)
 end
 
-function WWB.GetAccountSavedGearInventory(skipCurrentCharacter)
+function WWB.GetAccountSavedGearInInventory(skipCurrentCharacter)
 	local itemLocationTable = WW.GetItemLocation()
 	local preGearTable = {}
 
@@ -155,7 +155,7 @@ function WWB.DepositAllSetups()
 	if WW.DISABLEDBAGS[bankBag] then return end
 	
 	WW.Log(GetString(WW_MSG_DEPOSIT_ALL), WW.LOGTYPES.NORMAL, "FFFFFF")
-	local preGearTable = WWB.GetAccountSavedGearInventory()
+	local preGearTable = WWB.GetAccountSavedGearInInventory()
 	
 	local gearTable = {}
 	for id, item in pairs(preGearTable) do
