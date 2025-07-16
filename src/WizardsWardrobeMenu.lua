@@ -1,6 +1,5 @@
 WizardsWardrobe = WizardsWardrobe or {}
 local WW = WizardsWardrobe
-local logger = LibDebugLogger( "WizardsWardrobe" )
 
 WW.menu = {}
 local WWM = WW.menu
@@ -34,6 +33,7 @@ function WWM.InitSV()
 		prebuffs = {},
 		autoEquipSetups = true,
 		selectedZoneTag = 'GEN',
+		selectedPageId = nil,
 		selectedCharacterId = nil,
 	} )
 
@@ -101,14 +101,15 @@ function WWM.InitSV()
 	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
 		if characterSv["$LastCharacterName"] == GetUnitName("player") then
 			local selectedCharacterId = characterSv.selectedCharacterId
+			local tempStorage = WW.storage
 			if selectedCharacterId == "$AccountWide" then
-				WW.storage = WizardsWardrobeSV.Default[GetDisplayName()]["$AccountWide"].accountWideStorage
+				tempStorage = WizardsWardrobeSV.Default[GetDisplayName()]["$AccountWide"].accountWideStorage
 			elseif selectedCharacterId and selectedCharacterId ~= characterId then
-				WW.storage = WizardsWardrobeSV.Default[GetDisplayName()][selectedCharacterId]
+				tempStorage = WizardsWardrobeSV.Default[GetDisplayName()][selectedCharacterId]
 			end
-			WW.setups = WW.storage.setups
-			WW.pages = WW.storage.pages
-			WW.prebuffs = WW.storage.prebuffs
+			WW.setups = tempStorage.setups
+			WW.pages = tempStorage.pages
+			WW.prebuffs = tempStorage.prebuffs
 		end
 	end
 

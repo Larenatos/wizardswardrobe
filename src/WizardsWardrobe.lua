@@ -986,7 +986,7 @@ function WW.OnZoneChange( _, _ )
 				WW.gui.OnZoneSelect(WW.currentZone)
 			else
 				-- select the last selected zone before reload
-				WW.gui.OnZoneSelect(WW.zones[WW.storage.selectedZoneTag])
+				WW.gui.OnZoneSelect(WW.zones[WW.storage.selectedZoneTag], WW.storage.selectedPageId)
 			end
 		elseif shouldSelectCurrent then
 			WW.gui.OnZoneSelect(WW.currentZone)

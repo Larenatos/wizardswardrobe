@@ -535,11 +535,11 @@ function WWG.SetupTopMenu()
 	WWG.SetTooltip( WizardsWardrobeWindowTopMenuButtonsBankAll, TOP, GetString( WW_BUTTON_BANKALL ) )
 end
 
-function WWG.OnZoneSelect( zone )
+function WWG.OnZoneSelect( zone, pageId )
 	if (WW.currentZoneId ~= 0) then
 		WW.storage.selectedZoneTag = zone.tag
 	end
-	
+
 	PlaySound( SOUNDS.TABLET_PAGE_TURN )
 	local node = WWG.tree.tree:GetTreeNodeByData( zone )
 	if not WW.pages[ zone.tag ] then
@@ -548,7 +548,12 @@ function WWG.OnZoneSelect( zone )
 	end
 
 	WW.selection.zone = zone
-	WW.selection.pageId = WW.pages[ zone.tag ][ 0 ].selected
+
+	if pageId then
+		WW.selection.pageId = pageId
+	else
+		WW.selection.pageId = WW.pages[ zone.tag ][ 0 ].selected
+	end
 
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId )
 
@@ -583,19 +588,15 @@ function WWG.SetupCharacterDropdown()
 	comboBox:SetSortsItems(false)
 	WizardsWardrobeWindowCharacterDropdown.comboBox = comboBox
 
-	local loggedInCharacterId
-
 	comboBox:ClearItems()
 	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
 		local characterName = characterSv["$LastCharacterName"] or "Account Wide"
-
-		if characterName == GetUnitName("player") then 
-			loggedInCharacterId = characterId
+		if characterName == GetUnitName("player") then
 			if characterSv.selectedCharacterId then
 				if characterSv.selectedCharacterId == "$AccountWide" then
 					comboBox:SetSelectedItem("Account Wide")
 				else
-					comboBox:SetSelectedItem(WizardsWardrobeSV.Default[GetDisplayName()][characterSv.selectedCharacterId]["$LastCharacterName"]) 
+					comboBox:SetSelectedItem(WizardsWardrobeSV.Default[GetDisplayName()][characterSv.selectedCharacterId]["$LastCharacterName"])
 				end
 			else
 				comboBox:SetSelectedItem(characterName)
@@ -603,14 +604,15 @@ function WWG.SetupCharacterDropdown()
 		end
 
 		local entry = comboBox:CreateItemEntry(characterName, function()
+			local tempStorage
 			if characterId == "$AccountWide" then
-				WW.storage = WizardsWardrobeSV.Default[GetDisplayName()][characterId].accountWideStorage
+				tempStorage = WizardsWardrobeSV.Default[GetDisplayName()][characterId].accountWideStorage
 			else
-				WW.storage = WizardsWardrobeSV.Default[GetDisplayName()][characterId]
+				tempStorage = WizardsWardrobeSV.Default[GetDisplayName()][characterId]
 			end
-			WW.setups = WW.storage.setups
-			WW.pages = WW.storage.pages
-			WW.prebuffs = WW.storage.prebuffs
+			WW.setups = tempStorage.setups
+			WW.pages = tempStorage.pages
+			WW.prebuffs = tempStorage.prebuffs
 
 			if not WW.pages[ WW.selection.zone.tag ] then
 				WWG.OnZoneSelect(WW.selection.zone)
@@ -618,7 +620,8 @@ function WWG.SetupCharacterDropdown()
 				WW.selection.pageId = WW.pages[ WW.selection.zone.tag ][ 0 ].selected
 				WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 			end
-			WizardsWardrobeSV.Default[GetDisplayName()][loggedInCharacterId].selectedCharacterId = characterId
+			WW.storage.selectedCharacterId = characterId
+			WW.storage.selectedPageId = WW.selection.pageId
 		end)
 		comboBox:AddItem(entry)
 	end
@@ -676,6 +679,7 @@ function WWG.SetupPagesDropdown()
 			entry = comboBox:CreateItemEntry(page.name, function() 
 					WW.selection.pageId = pageId
 					WW.pages[ WW.selection.zone.tag ][ 0 ].selected = pageId
+					WW.storage.selectedPageId = pageId
 					WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 				end
 			)
@@ -1340,6 +1344,7 @@ function WWG.CreatePage( zone, skipBuilding, refreshTree )
 
 	WW.pages[ zone.tag ][ 0 ].selected = nextPageId
 	WW.selection.pageId = nextPageId
+	WW.storage.selectedPageId = nextPageId
 
 	WWG.CreateDefaultSetups( zone, nextPageId )
 
@@ -1395,6 +1400,7 @@ function WWG.DeletePage()
 
 	WW.pages[ zone.tag ][ 0 ].selected = nextPageId
 	WW.selection.pageId = nextPageId
+	WW.storage.selectedPageId = nextPageId
 
 	table.remove( WW.setups[ zone.tag ], pageId )
 	table.remove( WW.pages[ zone.tag ], pageId )
@@ -1431,6 +1437,7 @@ function WWG.PageLeft()
 	end
 	local prevPage = WW.selection.pageId - 1
 	WW.selection.pageId = prevPage
+	WW.storage.selectedPageId = prevPage
 	WW.pages[ WW.selection.zone.tag ][ 0 ].selected = prevPage
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 end
@@ -1441,6 +1448,7 @@ function WWG.PageRight()
 	end
 	local nextPage = WW.selection.pageId + 1
 	WW.selection.pageId = nextPage
+	WW.storage.selectedPageId = nextPageId
 	WW.pages[ WW.selection.zone.tag ][ 0 ].selected = nextPage
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 end
