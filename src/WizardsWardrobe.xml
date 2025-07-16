@@ -449,8 +449,8 @@
 			<Dimensions x="32" y="32" />
 			<Anchor point="LEFT" relativeTo="$(parent)" relativePoint="RIGHT"/>
 			<OnMouseEnter>
-			InitializeTooltip(InformationTooltip, self, BOTTOMLEFT, 0, 0, TOPLEFT) 
-			SetTooltipText(InformationTooltip, ZO_ERROR_COLOR:Colorize(GetString( WW_BUTTON_EXITWARNING_TT )))
+				InitializeTooltip(InformationTooltip, self, BOTTOMLEFT, 0, 0, TOPLEFT) 
+				SetTooltipText(InformationTooltip, ZO_ERROR_COLOR:Colorize(GetString( WW_BUTTON_EXITWARNING_TT )))
 			</OnMouseEnter>
 			<OnMouseExit>ClearTooltip(InformationTooltip)</OnMouseExit>
 			<OnMouseDown>self:GetParent().callback()</OnMouseDown>
