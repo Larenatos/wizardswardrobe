@@ -121,8 +121,14 @@ function WWB.GetAccountSavedGearInInventory(skipCurrentCharacter)
 	local preGearTable = {}
 
 	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
-		if (skipCurrentCharacter and characterSv["$LastCharacterName"] ~= GetUnitName("player")) or characterId ~= "$AccountWide" then
-			for zoneTag, setupPages in pairs(characterSv.setups) do
+		if not skipCurrentCharacter or characterSv["$LastCharacterName"] ~= GetUnitName("player") then
+			local SVsetups
+			if characterId == "$AccountWide" then
+				SVsetups = characterSv.accountWideStorage.setups
+			else
+				SVsetups = characterSv.setups
+			end
+			for zoneTag, setupPages in pairs(SVsetups) do
 				for pageId, setups in pairs(setupPages) do
 					for _, setup in ipairs( setups ) do
 						if setup.gear then
