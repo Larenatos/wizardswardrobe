@@ -411,8 +411,7 @@ function WWG.OnWindowResize( action )
 		WWG.addSetupButtonSpacer:SetAnchor( TOP, scrollBox, TOP, 0, itemsPerCol * SETUP_BOX_HEIGHT + 10 )
 
 		WizardsWardrobeWindowTitle:SetWidth( width )
-		WizardsWardrobeWindowCharacterMenu:SetWidth( width )
-		WizardsWardrobeWindowCharacterMenuCharactersDropdown:SetDimensionConstraints( 140, 29, width - 30, 29 )
+		WizardsWardrobeWindowCharacterDropdown:SetDimensionConstraints( 140, 0, width - 30, 29 )
 		WizardsWardrobeWindowPageMenu:SetWidth( width )
 		WizardsWardrobeWindowSetupList:SetDimensions( width, height - 20 )
 		scrollBox:SetDimensionConstraints( width, height, FLEX_ALIGNMENT_AUTO, FLEX_ALIGNMENT_AUTO )
@@ -580,43 +579,49 @@ function WWG.OnZoneSelect( zone )
 end
 
 function WWG.SetupCharacterDropdown()
-	local comboBox = ZO_ComboBox_ObjectFromContainer(WizardsWardrobeWindowCharacterMenuCharactersDropdown)
+	local comboBox = ZO_ComboBox_ObjectFromContainer(WizardsWardrobeWindowCharacterDropdown)
 	comboBox:SetSortsItems(false)
-	WizardsWardrobeWindowCharacterMenuCharactersDropdown.comboBox = comboBox
+	WizardsWardrobeWindowCharacterDropdown.comboBox = comboBox
 
-	local function updateStorageToCharacter(characterId)
-		if characterId == "$AccountWide" then
-			WW.storage = WizardsWardrobeSV.Default[GetDisplayName()][characterId].accountWideStorage
-		else
-			WW.storage = WizardsWardrobeSV.Default[GetDisplayName()][characterId]
-		end
-		WW.setups = WW.storage.setups
-		WW.pages = WW.storage.pages
-		WW.prebuffs = WW.storage.prebuffs
-	end
+	local loggedInCharacterId
 
 	comboBox:ClearItems()
-	local SelectedCharacterName
 	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
 		local characterName = characterSv["$LastCharacterName"] or "Account Wide"
-		if WW.settings.selectedCharacterId == characterId then SelectedCharacterName = characterName end
+
+		if characterName == GetUnitName("player") then 
+			loggedInCharacterId = characterId
+			if characterSv.selectedCharacterId then
+				if characterSv.selectedCharacterId == "$AccountWide" then
+					comboBox:SetSelectedItem("Account Wide")
+				else
+					comboBox:SetSelectedItem(WizardsWardrobeSV.Default[GetDisplayName()][characterSv.selectedCharacterId]["$LastCharacterName"]) 
+				end
+			else
+				comboBox:SetSelectedItem(characterName)
+			end
+		end
 
 		local entry = comboBox:CreateItemEntry(characterName, function()
-			updateStorageToCharacter(characterId)
+			if characterId == "$AccountWide" then
+				WW.storage = WizardsWardrobeSV.Default[GetDisplayName()][characterId].accountWideStorage
+			else
+				WW.storage = WizardsWardrobeSV.Default[GetDisplayName()][characterId]
+			end
+			WW.setups = WW.storage.setups
+			WW.pages = WW.storage.pages
+			WW.prebuffs = WW.storage.prebuffs
+
 			if not WW.pages[ WW.selection.zone.tag ] then
 				WWG.OnZoneSelect(WW.selection.zone)
 			else
 				WW.selection.pageId = WW.pages[ WW.selection.zone.tag ][ 0 ].selected
 				WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 			end
-			WW.settings.selectedCharacterId = characterId
+			WizardsWardrobeSV.Default[GetDisplayName()][loggedInCharacterId].selectedCharacterId = characterId
 		end)
 		comboBox:AddItem(entry)
 	end
-
-	if not SelectedCharacterName then GetDisplayName("Player") end
-	comboBox:SetSelectedItem(SelectedCharacterName)
-	if WW.settings.selectedCharacterId then updateStorageToCharacter(WW.settings.selectedCharacterId) end
 end
 
 function WWG.SetupPageMenu()

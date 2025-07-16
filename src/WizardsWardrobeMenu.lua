@@ -1,5 +1,6 @@
 WizardsWardrobe = WizardsWardrobe or {}
 local WW = WizardsWardrobe
+local logger = LibDebugLogger( "WizardsWardrobe" )
 
 WW.menu = {}
 local WWM = WW.menu
@@ -33,10 +34,8 @@ function WWM.InitSV()
 		prebuffs = {},
 		autoEquipSetups = true,
 		selectedZoneTag = 'GEN',
+		selectedCharacterId = nil,
 	} )
-	WW.setups = WW.storage.setups
-	WW.pages = WW.storage.pages
-	WW.prebuffs = WW.storage.prebuffs
 
 	WW.settings = ZO_SavedVars:NewAccountWide( "WizardsWardrobeSV", 1, nil, {
 		window = {
@@ -97,8 +96,21 @@ function WWM.InitSV()
 			autoEquipSetups = true,
 			selectedZoneTag = 'GEN',
     },
-		selectedCharacterId = nil,
 	} )
+
+	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
+		if characterSv["$LastCharacterName"] == GetUnitName("player") then
+			local selectedCharacterId = characterSv.selectedCharacterId
+			if selectedCharacterId == "$AccountWide" then
+				WW.storage = WizardsWardrobeSV.Default[GetDisplayName()]["$AccountWide"].accountWideStorage
+			elseif selectedCharacterId and selectedCharacterId ~= characterId then
+				WW.storage = WizardsWardrobeSV.Default[GetDisplayName()][selectedCharacterId]
+			end
+			WW.setups = WW.storage.setups
+			WW.pages = WW.storage.pages
+			WW.prebuffs = WW.storage.prebuffs
+		end
+	end
 
 	-- migrate validation settings
 	if WW.settings.validationDelay then
