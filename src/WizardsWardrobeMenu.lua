@@ -94,7 +94,6 @@ function WWM.InitSV()
 			pages = {},
 			prebuffs = {},
 			autoEquipSetups = true,
-			selectedZoneTag = 'GEN',
     },
 	} )
 
