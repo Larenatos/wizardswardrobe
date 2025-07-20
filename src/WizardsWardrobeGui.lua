@@ -589,19 +589,19 @@ function WWG.SetupCharacterDropdown()
 	WizardsWardrobeWindowCharacterDropdown.comboBox = comboBox
 
 	comboBox:ClearItems()
-	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
+
+	local orderedCharInfo = {
+	}
+	for i = 1, GetNumCharacters() do
+		local _, _, _, _, _, _, id, _ = GetCharacterInfo(i)
+		orderedCharInfo[i] = {characterId = id, characterSv = WizardsWardrobeSV.Default[GetDisplayName()][id]}
+	end
+	orderedCharInfo[GetNumCharacters() + 1] = {characterId = "$AccountWide", characterSv = WizardsWardrobeSV.Default[GetDisplayName()]["$AccountWide"]}
+
+	for i, charInfo in pairs(orderedCharInfo) do
+		local characterId = charInfo.characterId
+		local characterSv = charInfo.characterSv
 		local characterName = characterSv["$LastCharacterName"] or "Account Wide"
-		if characterName == GetUnitName("player") then
-			if characterSv.selectedCharacterId then
-				if characterSv.selectedCharacterId == "$AccountWide" then
-					comboBox:SetSelectedItem("Account Wide")
-				else
-					comboBox:SetSelectedItem(WizardsWardrobeSV.Default[GetDisplayName()][characterSv.selectedCharacterId]["$LastCharacterName"])
-				end
-			else
-				comboBox:SetSelectedItem(characterName)
-			end
-		end
 
 		local entry = comboBox:CreateItemEntry(characterName, function()
 			local tempStorage
@@ -624,6 +624,18 @@ function WWG.SetupCharacterDropdown()
 			WW.storage.selectedPageId = WW.selection.pageId
 		end)
 		comboBox:AddItem(entry)
+
+		if characterName == GetUnitName("player") then
+			if characterSv.selectedCharacterId then
+				if characterSv.selectedCharacterId == "$AccountWide" then
+					comboBox:SetSelectedItem("Account Wide")
+				else
+					comboBox:SetSelectedItem(WizardsWardrobeSV.Default[GetDisplayName()][characterSv.selectedCharacterId]["$LastCharacterName"])
+				end
+			else
+				comboBox:SetSelectedItem(characterName)
+			end
+		end
 	end
 end
 
