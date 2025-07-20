@@ -589,16 +589,15 @@ function WWG.SetupCharacterDropdown()
 	WizardsWardrobeWindowCharacterDropdown.comboBox = comboBox
 
 	comboBox:ClearItems()
-
-	local orderedCharInfo = {
-	}
+	
+	local orderedCharInfo = {}
 	for i = 1, GetNumCharacters() do
 		local _, _, _, _, _, _, id, _ = GetCharacterInfo(i)
-		orderedCharInfo[i] = {characterId = id, characterSv = WizardsWardrobeSV.Default[GetDisplayName()][id]}
+		table.insert(orderedCharInfo, {characterId = id, characterSv = WizardsWardrobeSV.Default[GetDisplayName()][id]})
 	end
-	orderedCharInfo[GetNumCharacters() + 1] = {characterId = "$AccountWide", characterSv = WizardsWardrobeSV.Default[GetDisplayName()]["$AccountWide"]}
+	table.insert(orderedCharInfo, {characterId = "$AccountWide", characterSv = WizardsWardrobeSV.Default[GetDisplayName()]["$AccountWide"]})
 
-	for i, charInfo in pairs(orderedCharInfo) do
+	for i, charInfo in ipairs(orderedCharInfo) do
 		local characterId = charInfo.characterId
 		local characterSv = charInfo.characterSv
 		local characterName = characterSv["$LastCharacterName"] or "Account Wide"
