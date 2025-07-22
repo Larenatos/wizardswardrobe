@@ -411,7 +411,7 @@ function WWG.OnWindowResize( action )
 		WWG.addSetupButtonSpacer:SetAnchor( TOP, scrollBox, TOP, 0, itemsPerCol * SETUP_BOX_HEIGHT + 10 )
 
 		WizardsWardrobeWindowTitle:SetWidth( width )
-		WizardsWardrobeWindowCharacterDropdown:SetDimensionConstraints( 140, 0, width - 30, 29 )
+		WizardsWardrobeWindowBottomMenuCharacterDropdown:SetDimensionConstraints( 90, 0, width / 4, 20 )
 		WizardsWardrobeWindowPageMenu:SetWidth( width )
 		WizardsWardrobeWindowSetupList:SetDimensions( width, height - 20 )
 		scrollBox:SetDimensionConstraints( width, height, FLEX_ALIGNMENT_AUTO, FLEX_ALIGNMENT_AUTO )
@@ -419,7 +419,7 @@ function WWG.OnWindowResize( action )
 
 		WizardsWardrobeWindowTopDivider:SetWidth( width )
 		WizardsWardrobeWindowBottomDivider:SetWidth( width )
-		
+
 		WizardsWardrobeWindowPageMenuPagesDropdownSelectedItemText:SetDimensionConstraints(140, 0, width - 200, 29)
 	end
 
@@ -584,9 +584,9 @@ function WWG.OnZoneSelect( zone, pageId )
 end
 
 function WWG.SetupCharacterDropdown()
-	local comboBox = ZO_ComboBox_ObjectFromContainer(WizardsWardrobeWindowCharacterDropdown)
+	local comboBox = ZO_ComboBox_ObjectFromContainer(WizardsWardrobeWindowBottomMenuCharacterDropdown)
 	comboBox:SetSortsItems(false)
-	WizardsWardrobeWindowCharacterDropdown.comboBox = comboBox
+	WizardsWardrobeWindowBottomMenuCharacterDropdown.comboBox = comboBox
 
 	comboBox:ClearItems()
 	
