@@ -604,16 +604,17 @@ function WWG.SetupCharacterDropdown()
 				selectedZoneTag = 'GEN',
 				selectedPageId = 1,
 				selectedCharacterId = id,
+				["$LastCharacterName"] = name:sub(1, -4)
 			}
 		end
-		table.insert(orderedCharInfo, {characterId = id, characterSv = savedVariables[id], characterName = name:sub(1, -4)})
+		table.insert(orderedCharInfo, {characterId = id, characterSv = savedVariables[id]})
 	end
 	table.insert(orderedCharInfo, {characterId = "$AccountWide", characterSv = savedVariables["$AccountWide"]})
 
 	for i, charInfo in ipairs(orderedCharInfo) do
 		local characterId = charInfo.characterId
 		local characterSv = charInfo.characterSv
-		local characterName = charInfo.characterName or "Account Wide"
+		local characterName = savedVariables[characterId]["$LastCharacterName"] or "Account Wide"
 
 		local entry = comboBox:CreateItemEntry(characterName, function()
 			local tempStorage
