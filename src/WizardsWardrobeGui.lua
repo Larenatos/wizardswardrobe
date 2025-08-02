@@ -594,22 +594,33 @@ function WWG.SetupCharacterDropdown()
 	local orderedCharInfo = {}
 	local savedVariables = WizardsWardrobeSV.Default[GetDisplayName()]
 	for i = 1, GetNumCharacters() do
-		local _, _, _, _, _, _, id, _ = GetCharacterInfo(i)
-		table.insert(orderedCharInfo, {characterId = id, characterSv = savedVariables[id]})
+		local name, _, _, _, _, _, id, _ = GetCharacterInfo(i)
+		if not savedVariables[id] then
+			savedVariables[id] = {
+				setups = {},
+				pages = {},
+				prebuffs = {},
+				autoEquipSetups = true,
+				selectedZoneTag = 'GEN',
+				selectedPageId = 1,
+				selectedCharacterId = id,
+			}
+		end
+		table.insert(orderedCharInfo, {characterId = id, characterSv = savedVariables[id], characterName = name:sub(1, -4)})
 	end
-	table.insert(orderedCharInfo, {characterId = "$AccountWide", characterSv = WizardsWardrobeSV.Default[GetDisplayName()]["$AccountWide"]})
+	table.insert(orderedCharInfo, {characterId = "$AccountWide", characterSv = savedVariables["$AccountWide"]})
 
 	for i, charInfo in ipairs(orderedCharInfo) do
 		local characterId = charInfo.characterId
 		local characterSv = charInfo.characterSv
-		local characterName = characterSv["$LastCharacterName"] or "Account Wide"
+		local characterName = charInfo.characterName or "Account Wide"
 
 		local entry = comboBox:CreateItemEntry(characterName, function()
 			local tempStorage
 			if characterId == "$AccountWide" then
-				tempStorage = WizardsWardrobeSV.Default[GetDisplayName()][characterId].accountWideStorage
+				tempStorage = savedVariables[characterId].accountWideStorage
 			else
-				tempStorage = WizardsWardrobeSV.Default[GetDisplayName()][characterId]
+				tempStorage = savedVariables[characterId]
 			end
 			WW.setups = tempStorage.setups
 			WW.pages = tempStorage.pages
@@ -631,7 +642,7 @@ function WWG.SetupCharacterDropdown()
 				if characterSv.selectedCharacterId == "$AccountWide" then
 					comboBox:SetSelectedItem("Account Wide")
 				else
-					comboBox:SetSelectedItem(WizardsWardrobeSV.Default[GetDisplayName()][characterSv.selectedCharacterId]["$LastCharacterName"])
+					comboBox:SetSelectedItem(savedVariables[characterSv.selectedCharacterId]["$LastCharacterName"])
 				end
 			else
 				comboBox:SetSelectedItem(characterName)
