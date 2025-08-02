@@ -88,7 +88,6 @@ function WWM.InitSV()
 		autoSelectInstance = true,
 		autoSelectGeneral = false,
 		lockSavedGear = true,
-		showExitWarnings = true,
 		accountWideStorage = {
 			setups = {},
 			pages = {},
