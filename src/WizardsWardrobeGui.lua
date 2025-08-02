@@ -411,7 +411,9 @@ function WWG.OnWindowResize( action )
 		WWG.addSetupButtonSpacer:SetAnchor( TOP, scrollBox, TOP, 0, itemsPerCol * SETUP_BOX_HEIGHT + 10 )
 
 		WizardsWardrobeWindowTitle:SetWidth( width )
-		WizardsWardrobeWindowBottomMenuCharacterDropdown:SetDimensionConstraints( 90, 0, width / 4, 20 )
+		local characterDropdownMaxWidth = width/2-70
+		local characterDropdownMinWidth = characterDropdownMaxWidth < 140 and characterDropdownMaxWidth or 140
+		WizardsWardrobeWindowBottomMenuCharacterDropdown:SetDimensionConstraints( characterDropdownMinWidth, 0,characterDropdownMaxWidth, 20 )
 		WizardsWardrobeWindowPageMenu:SetWidth( width )
 		WizardsWardrobeWindowSetupList:SetDimensions( width, height - 20 )
 		scrollBox:SetDimensionConstraints( width, height, FLEX_ALIGNMENT_AUTO, FLEX_ALIGNMENT_AUTO )
@@ -589,6 +591,8 @@ function WWG.SetupCharacterDropdown()
 	WizardsWardrobeWindowBottomMenuCharacterDropdown.comboBox = comboBox
 
 	comboBox:ClearItems()
+	comboBox:AddItem(comboBox:CreateItemEntry("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", function() end))
+	comboBox:AddItem(comboBox:CreateItemEntry("woo", function() end))
 	
 	local orderedCharInfo = {}
 	local savedVariables = WizardsWardrobeSV.Default[GetDisplayName()]
