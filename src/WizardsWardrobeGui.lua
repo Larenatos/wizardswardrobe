@@ -591,9 +591,6 @@ function WWG.SetupCharacterDropdown()
 	WizardsWardrobeWindowBottomMenuCharacterDropdown.comboBox = comboBox
 
 	comboBox:ClearItems()
-	comboBox:AddItem(comboBox:CreateItemEntry("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", function() end))
-	comboBox:AddItem(comboBox:CreateItemEntry("woo", function() end))
-	
 	local orderedCharInfo = {}
 	local savedVariables = WizardsWardrobeSV.Default[GetDisplayName()]
 	for i = 1, GetNumCharacters() do
