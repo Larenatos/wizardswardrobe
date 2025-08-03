@@ -596,16 +596,9 @@ function WWG.SetupCharacterDropdown()
 	for i = 1, GetNumCharacters() do
 		local name, _, _, _, _, _, id, _ = GetCharacterInfo(i)
 		if not savedVariables[id] then
-			savedVariables[id] = {
-				setups = {},
-				pages = {},
-				prebuffs = {},
-				autoEquipSetups = true,
-				selectedZoneTag = 'GEN',
-				selectedPageId = 1,
-				selectedCharacterId = id,
-				["$LastCharacterName"] = name:sub(1, -4)
-			}
+			local newSV = WW.DefaultSavedVariables(id)
+			newSV["$LastCharacterName"] = name:sub(1, -4)
+			savedVariables[id] = newSV
 		end
 		table.insert(orderedCharInfo, {characterId = id, characterSv = savedVariables[id]})
 	end
@@ -627,18 +620,18 @@ function WWG.SetupCharacterDropdown()
 			WW.pages = tempStorage.pages
 			WW.prebuffs = tempStorage.prebuffs
 
-			if not WW.pages[ WW.selection.zone.tag ] then
+			if not WW.pages[WW.selection.zone.tag] then
 				WWG.OnZoneSelect(WW.selection.zone)
 			else
-				WW.selection.pageId = WW.pages[ WW.selection.zone.tag ][ 0 ].selected
-				WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
+				WW.selection.pageId = WW.pages[WW.selection.zone.tag][0].selected
+				WWG.BuildPage(WW.selection.zone, WW.selection.pageId, true)
 			end
 			WW.storage.selectedCharacterId = characterId
 			WW.storage.selectedPageId = WW.selection.pageId
 		end)
 		comboBox:AddItem(entry)
 
-		if characterName == GetUnitName("player") then
+		if characterId == GetCurrentCharacterId() then
 			if characterSv.selectedCharacterId then
 				if characterSv.selectedCharacterId == "$AccountWide" then
 					comboBox:SetSelectedItem("Account Wide")

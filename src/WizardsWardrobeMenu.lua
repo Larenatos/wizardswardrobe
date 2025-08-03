@@ -1,5 +1,6 @@
 WizardsWardrobe = WizardsWardrobe or {}
 local WW = WizardsWardrobe
+local logger = LibDebugLogger:Create("WizardsWardrobe")
 
 WW.menu = {}
 local WWM = WW.menu
@@ -26,16 +27,20 @@ local addonMenuChoices = {
 		GetString( WW_MENU_COMPARISON_DEPTH_THOROUGH_TT ),
 	}
 }
-function WWM.InitSV()
-	WW.storage = ZO_SavedVars:NewCharacterIdSettings( "WizardsWardrobeSV", 1, nil, {
+function WW.DefaultSavedVariables(characterId)
+	return {
 		setups = {},
 		pages = {},
 		prebuffs = {},
 		autoEquipSetups = true,
 		selectedZoneTag = 'GEN',
-		selectedPageId = nil,
-		selectedCharacterId = nil,
-	} )
+		selectedPageId = 1,
+		selectedCharacterId = characterId,
+	}
+end
+
+function WWM.InitSV()
+	WW.storage = ZO_SavedVars:NewCharacterIdSettings( "WizardsWardrobeSV", 1, nil, WW.DefaultSavedVariables(GetCurrentCharacterId()))
 
 	WW.settings = ZO_SavedVars:NewAccountWide( "WizardsWardrobeSV", 1, nil, {
 		window = {
