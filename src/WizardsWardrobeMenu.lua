@@ -1,6 +1,5 @@
 WizardsWardrobe = WizardsWardrobe or {}
 local WW = WizardsWardrobe
-local logger = LibDebugLogger:Create("WizardsWardrobe")
 
 WW.menu = {}
 local WWM = WW.menu
@@ -101,20 +100,18 @@ function WWM.InitSV()
     },
 	} )
 
-	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
-		if characterSv["$LastCharacterName"] == GetUnitName("player") then
-			local selectedCharacterId = characterSv.selectedCharacterId
-			local tempStorage = WW.storage
-			if selectedCharacterId == "$AccountWide" then
-				tempStorage = WizardsWardrobeSV.Default[GetDisplayName()]["$AccountWide"].accountWideStorage
-			elseif selectedCharacterId and selectedCharacterId ~= characterId then
-				tempStorage = WizardsWardrobeSV.Default[GetDisplayName()][selectedCharacterId]
-			end
-			WW.setups = tempStorage.setups
-			WW.pages = tempStorage.pages
-			WW.prebuffs = tempStorage.prebuffs
-		end
+	local savedVariables = WizardsWardrobeSV.Default[GetDisplayName()]
+	local characterSv = savedVariables[GetCurrentCharacterId()]
+	local selectedCharacterId = characterSv.selectedCharacterId
+	local tempStorage = WW.storage
+	if selectedCharacterId == "$AccountWide" then
+		tempStorage = savedVariables["$AccountWide"].accountWideStorage
+	elseif selectedCharacterId and selectedCharacterId ~= characterId then
+		tempStorage = savedVariables[selectedCharacterId]
 	end
+	WW.setups = tempStorage.setups
+	WW.pages = tempStorage.pages
+	WW.prebuffs = tempStorage.prebuffs
 
 	-- migrate validation settings
 	if WW.settings.validationDelay then

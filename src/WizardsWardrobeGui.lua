@@ -24,8 +24,6 @@ local DIVIDER_HEIGHT = 2
 local SETUP_BOX_WIDTH = 350
 local SETUP_BOX_HEIGHT = 128
 
-local logger = LibDebugLogger( WW.name )
-
 function WWG.Init()
 	WWG.name = WW.name .. "Gui"
 	WWG.setupTable = {}
@@ -542,9 +540,6 @@ end
 function WWG.OnZoneSelect( zone, pageId )
 	if (WW.currentZoneId ~= 0) then
 		WW.storage.selectedZoneTag = zone.tag
-		if zone.tag ~= "GEN" then
-			WW.storage.selectedPageId = WW.pages[zone.tag][0].selected
-		end
 	end
 
 	PlaySound( SOUNDS.TABLET_PAGE_TURN )
@@ -556,7 +551,7 @@ function WWG.OnZoneSelect( zone, pageId )
 
 	WW.selection.zone = zone
 
-	if pageId then
+	if pageId and zone.tag == "GEN" then
 		WW.selection.pageId = pageId
 	else
 		WW.selection.pageId = WW.pages[zone.tag][0].selected
@@ -650,6 +645,12 @@ function WWG.SetupCharacterDropdown()
 	end
 end
 
+function WWG.UpdatePageId(zoneTag, pageId)
+	WW.selection.pageId = pageId
+	WW.pages[ zoneTag ][ 0 ].selected = pageId
+	WW.storage.selectedPageId = pageId
+end
+
 function WWG.SetupPageMenu()
 	WizardsWardrobeWindowPageMenuWarning:SetHandler( "OnMouseUp", function( self, mouseButton )
 		if mouseButton == MOUSE_BUTTON_INDEX_LEFT then
@@ -700,18 +701,13 @@ function WWG.SetupPagesDropdown()
 	for pageId, page in pairs(WW.pages[ WW.selection.zone.tag ]) do
 		if pageId ~= 0 then
 			entry = comboBox:CreateItemEntry(page.name, function() 
-					WW.selection.pageId = pageId
-					WW.pages[ WW.selection.zone.tag ][ 0 ].selected = pageId
-					WW.storage.selectedPageId = pageId
+					WWG.UpdatePageId(WW.selection.zone.tag, pageId)
 					WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 				end
 			)
 			comboBox:AddItem(entry)
 		end
 	end
-	-- logger:Warn(WW.selection.zone.tag)
-	-- logger:Warn(WW.selection.pageId)
-	-- logger:Warn(WW.pages[ WW.selection.zone.tag ][ WW.selection.pageId ].name)
 	comboBox:SetSelectedItem(WW.pages[ WW.selection.zone.tag ][ WW.selection.pageId ].name)
 end
 
@@ -1367,9 +1363,7 @@ function WWG.CreatePage( zone, skipBuilding, refreshTree )
 		name = string.format( GetString( WW_PAGE ), tostring( nextPageId ) ),
 	}
 
-	WW.pages[ zone.tag ][ 0 ].selected = nextPageId
-	WW.selection.pageId = nextPageId
-	WW.storage.selectedPageId = nextPageId
+	WWG.UpdatePageId(zone.tag, nextPageId)
 
 	WWG.CreateDefaultSetups( zone, nextPageId )
 
@@ -1423,9 +1417,7 @@ function WWG.DeletePage()
 	local nextPageId = pageId - 1
 	if nextPageId < 1 then nextPageId = pageId end
 
-	WW.pages[ zone.tag ][ 0 ].selected = nextPageId
-	WW.selection.pageId = nextPageId
-	WW.storage.selectedPageId = nextPageId
+	WWG.UpdatePageId(zone.tag, nextPageId)
 
 	table.remove( WW.setups[ zone.tag ], pageId )
 	table.remove( WW.pages[ zone.tag ], pageId )
@@ -1461,9 +1453,7 @@ function WWG.PageLeft()
 		return
 	end
 	local prevPage = WW.selection.pageId - 1
-	WW.selection.pageId = prevPage
-	WW.storage.selectedPageId = prevPage
-	WW.pages[ WW.selection.zone.tag ][ 0 ].selected = prevPage
+	WWG.UpdatePageId(WW.selection.zone.tag, prevPage)
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 end
 
@@ -1472,9 +1462,7 @@ function WWG.PageRight()
 		return
 	end
 	local nextPage = WW.selection.pageId + 1
-	WW.selection.pageId = nextPage
-	WW.storage.selectedPageId = nextPageId
-	WW.pages[ WW.selection.zone.tag ][ 0 ].selected = nextPage
+	WWG.UpdatePageId(WW.selection.zone.tag, nextPage)
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 end
 
