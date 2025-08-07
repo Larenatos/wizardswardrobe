@@ -411,6 +411,9 @@ function WWG.OnWindowResize( action )
 		WWG.addSetupButtonSpacer:SetAnchor( TOP, scrollBox, TOP, 0, itemsPerCol * SETUP_BOX_HEIGHT + 10 )
 
 		WizardsWardrobeWindowTitle:SetWidth( width )
+		local characterDropdownMaxWidth = width/2-70
+		local characterDropdownMinWidth = characterDropdownMaxWidth < 140 and characterDropdownMaxWidth or 140
+		WizardsWardrobeWindowBottomMenuCharacterDropdown:SetDimensionConstraints( characterDropdownMinWidth, 0,characterDropdownMaxWidth, 20 )
 		WizardsWardrobeWindowPageMenu:SetWidth( width )
 		WizardsWardrobeWindowSetupList:SetDimensions( width, height - 20 )
 		scrollBox:SetDimensionConstraints( width, height, FLEX_ALIGNMENT_AUTO, FLEX_ALIGNMENT_AUTO )
@@ -418,7 +421,7 @@ function WWG.OnWindowResize( action )
 
 		WizardsWardrobeWindowTopDivider:SetWidth( width )
 		WizardsWardrobeWindowBottomDivider:SetWidth( width )
-		
+
 		WizardsWardrobeWindowPageMenuPagesDropdownSelectedItemText:SetDimensionConstraints(140, 0, width - 200, 29)
 
 		local characterDropdownMaxWidth = width/2-70
@@ -538,11 +541,11 @@ function WWG.SetupTopMenu()
 	WWG.SetTooltip( WizardsWardrobeWindowTopMenuButtonsBankAll, TOP, GetString( WW_BUTTON_BANKALL ) )
 end
 
-function WWG.OnZoneSelect( zone )
+function WWG.OnZoneSelect( zone, pageId )
 	if (WW.currentZoneId ~= 0) then
 		WW.storage.selectedZoneTag = zone.tag
 	end
-	
+
 	PlaySound( SOUNDS.TABLET_PAGE_TURN )
 	local node = WWG.tree.tree:GetTreeNodeByData( zone )
 	if not WW.pages[ zone.tag ] then
@@ -583,6 +586,72 @@ function WWG.OnZoneSelect( zone )
 	if node then
 		WWG.tree.tree:SelectNode( node )
 	end
+end
+
+function WWG.SetupCharacterDropdown()
+	local comboBox = ZO_ComboBox_ObjectFromContainer(WizardsWardrobeWindowBottomMenuCharacterDropdown)
+	comboBox:SetSortsItems(false)
+	WizardsWardrobeWindowBottomMenuCharacterDropdown.comboBox = comboBox
+
+	comboBox:ClearItems()
+	local orderedCharInfo = {}
+	local savedVariables = WizardsWardrobeSV.Default[GetDisplayName()]
+	for i = 1, GetNumCharacters() do
+		local name, _, _, _, _, _, id, _ = GetCharacterInfo(i)
+		if not savedVariables[id] then
+			local newSV = WW.DefaultSavedVariables(id)
+			newSV["$LastCharacterName"] = name:sub(1, -4)
+			savedVariables[id] = newSV
+		end
+		table.insert(orderedCharInfo, {characterId = id, characterSv = savedVariables[id]})
+	end
+	table.insert(orderedCharInfo, {characterId = "$AccountWide", characterSv = savedVariables["$AccountWide"]})
+
+	for i, charInfo in ipairs(orderedCharInfo) do
+		local characterId = charInfo.characterId
+		local characterSv = charInfo.characterSv
+		local characterName = savedVariables[characterId]["$LastCharacterName"] or "Account Wide"
+
+		local entry = comboBox:CreateItemEntry(characterName, function()
+			local tempStorage
+			if characterId == "$AccountWide" then
+				tempStorage = savedVariables[characterId].accountWideStorage
+			else
+				tempStorage = savedVariables[characterId]
+			end
+			WW.setups = tempStorage.setups
+			WW.pages = tempStorage.pages
+			WW.prebuffs = tempStorage.prebuffs
+
+			if not WW.pages[WW.selection.zone.tag] then
+				WWG.OnZoneSelect(WW.selection.zone)
+			else
+				WW.selection.pageId = WW.pages[WW.selection.zone.tag][0].selected
+				WWG.BuildPage(WW.selection.zone, WW.selection.pageId, true)
+			end
+			WW.storage.selectedCharacterId = characterId
+			WW.storage.selectedPageId = WW.selection.pageId
+		end)
+		comboBox:AddItem(entry)
+
+		if characterId == GetCurrentCharacterId() then
+			if characterSv.selectedCharacterId then
+				if characterSv.selectedCharacterId == "$AccountWide" then
+					comboBox:SetSelectedItem("Account Wide")
+				else
+					comboBox:SetSelectedItem(savedVariables[characterSv.selectedCharacterId]["$LastCharacterName"])
+				end
+			else
+				comboBox:SetSelectedItem(characterName)
+			end
+		end
+	end
+end
+
+function WWG.UpdatePageId(zoneTag, pageId)
+	WW.selection.pageId = pageId
+	WW.pages[ zoneTag ][ 0 ].selected = pageId
+	WW.storage.selectedPageId = pageId
 end
 
 function WWG.SetupPageMenu()
@@ -642,7 +711,6 @@ function WWG.SetupPagesDropdown()
 			comboBox:AddItem(entry)
 		end
 	end
-
 	comboBox:SetSelectedItem(WW.pages[ WW.selection.zone.tag ][ WW.selection.pageId ].name)
 end
 
