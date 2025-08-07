@@ -39,7 +39,7 @@ function WW.DefaultSavedVariables(characterId)
 end
 
 function WWM.InitSV()
-	WW.storage = ZO_SavedVars:NewCharacterIdSettings( "WizardsWardrobeSV", 1, nil, WW.DefaultSavedVariables(GetCurrentCharacterId()))
+	WW.storage = ZO_SavedVars:NewCharacterIdSettings( "WizardsWardrobeSV", 1, nil, WW.DefaultSavedVariables(WW.currentCharacterId))
 
 	WW.settings = ZO_SavedVars:NewAccountWide( "WizardsWardrobeSV", 1, nil, {
 		window = {
@@ -101,17 +101,16 @@ function WWM.InitSV()
 	} )
 
 	local savedVariables = WizardsWardrobeSV.Default[GetDisplayName()]
-	local characterSv = savedVariables[GetCurrentCharacterId()]
-	local selectedCharacterId = characterSv.selectedCharacterId
-	local tempStorage = WW.storage
+	local selectedCharacterSv = WW.storage
+	local selectedCharacterId = selectedCharacterSv.selectedCharacterId
 	if selectedCharacterId == "$AccountWide" then
-		tempStorage = savedVariables["$AccountWide"].accountWideStorage
-	elseif selectedCharacterId and selectedCharacterId ~= characterId then
-		tempStorage = savedVariables[selectedCharacterId]
+		selectedCharacterSv = savedVariables["$AccountWide"].accountWideStorage
+	elseif selectedCharacterId ~= WW.currentCharacterId then
+		selectedCharacterSv = savedVariables[selectedCharacterId]
 	end
-	WW.setups = tempStorage.setups
-	WW.pages = tempStorage.pages
-	WW.prebuffs = tempStorage.prebuffs
+	WW.setups = selectedCharacterSv.setups
+	WW.pages = selectedCharacterSv.pages
+	WW.prebuffs = selectedCharacterSv.prebuffs
 
 	-- migrate validation settings
 	if WW.settings.validationDelay then
