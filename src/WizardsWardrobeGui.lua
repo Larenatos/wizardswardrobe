@@ -648,7 +648,9 @@ end
 function WWG.UpdatePageId(zoneTag, pageId)
 	WW.selection.pageId = pageId
 	WW.pages[ zoneTag ][ 0 ].selected = pageId
-	WW.storage.selectedPageId = pageId
+	if zoneTag == "GEN" then
+		WW.storage.selectedPageId = pageId
+	end
 end
 
 function WWG.SetupPageMenu()
