@@ -106,7 +106,7 @@ function WWM.InitSV()
 	local tempStorage = WW.storage
 	if selectedCharacterId == "$AccountWide" then
 		tempStorage = savedVariables["$AccountWide"].accountWideStorage
-	elseif selectedCharacterId and selectedCharacterId ~= characterId then
+	elseif selectedCharacterId and selectedCharacterId ~= GetCurrentCharacterId() then
 		tempStorage = savedVariables[selectedCharacterId]
 	end
 	WW.setups = tempStorage.setups
