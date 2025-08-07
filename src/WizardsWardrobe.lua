@@ -120,7 +120,7 @@ end
 function WW.LoadSetupSubstitute( index )
 	if not WW.zones[ "SUB" ] or not WW.pages[ "SUB" ] then return end
 	local DO_NOT_SKIP_VALIDATION = false
-	WW.LoadSetup( WW.zones[ "SUB" ], WW.pages[ "SUB" ][ 0 ].selected, index, true, DO_NOT_SKIP_VALIDATION )
+	WW.LoadSetup( WW.zones["SUB"], WW.pages["SUB"][0][WW.currentCharacterId], index, true, DO_NOT_SKIP_VALIDATION )
 end
 
 function WW.SaveSetup( zone, pageId, index, skip )
@@ -981,15 +981,9 @@ function WW.OnZoneChange( _, _ )
 		local shouldSelectInstance = WW.settings.autoSelectInstance and WW.currentZone.tag ~= "GEN"
 		local shouldSelectGeneral = WW.settings.autoSelectGeneral and WW.currentZone.tag == "GEN"
 		local shouldSelectCurrent = shouldSelectInstance or shouldSelectGeneral
-		if isFirstZoneAfterReload then
-			if shouldSelectCurrent then
-				WW.gui.OnZoneSelect(WW.currentZone)
-			else
-				-- select the last selected zone before reload
-				WW.gui.OnZoneSelect(WW.zones[WW.storage.selectedZoneTag])
-			end
-		elseif shouldSelectCurrent then
-			WW.gui.OnZoneSelect(WW.currentZone)
+
+		if isFirstZoneAfterReload or shouldSelectCurrent then
+			WW.gui.OnZoneSelect(shouldSelectCurrent and WW.currentZone or WW.zones[WW.storage.selectedZoneTag])
 		end
 
 		if WW.settings.fixes.surfingWeapons then
@@ -1093,10 +1087,23 @@ function WW.Init()
 	WW.currentZone = WW.zones[ "GEN" ]
 	WW.currentZoneId = 0
 
-	WW.selection = {
+	WW.selection = setmetatable({}, {
 		zone = WW.zones[ "GEN" ],
-		pageId = 1
-	}
+		__index = function(table, key)
+			if key == "pageId" then
+					return WW.pages[table.zone.tag][0][WW.currentCharacterId]
+			end
+		end,
+		__newindex = function(table, key, value)
+			if key == "pageId" then
+					WW.pages[table.zone.tag][0][WW.currentCharacterId] = value
+			else
+					rawset(table, key, value)
+			end
+		end
+	})
+	
+	WW.currentCharacterId = GetCurrentCharacterId()
 end
 
 function WW.OnAddOnLoaded( _, addonName )

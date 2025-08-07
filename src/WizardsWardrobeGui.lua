@@ -543,10 +543,14 @@ function WWG.OnZoneSelect( zone )
 	if not WW.pages[ zone.tag ] then
 		local DO_NOT_REFRESH_TREE = false
 		WWG.CreatePage( zone, true, DO_NOT_REFRESH_TREE )
+	else
+		-- could move this to the first start new version section to do a one time migration instead
+		WW.pages[zone.tag] = WW.pages[zone.tag] or {}
+		WW.pages[zone.tag][0] = WW.pages[zone.tag][0] or {}
+		WW.pages[zone.tag][0][WW.currentCharacterId] = WW.pages[zone.tag][0][WW.currentCharacterId] or WW.pages[zone.tag][0].selected or 1
 	end
 
 	WW.selection.zone = zone
-	WW.selection.pageId = WW.pages[ zone.tag ][ 0 ].selected
 
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId )
 
@@ -627,7 +631,6 @@ function WWG.SetupPagesDropdown()
 		if pageId ~= 0 then
 			entry = comboBox:CreateItemEntry(page.name, function() 
 					WW.selection.pageId = pageId
-					WW.pages[ WW.selection.zone.tag ][ 0 ].selected = pageId
 					WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 				end
 			)
@@ -1279,18 +1282,15 @@ function WWG.BuildPage( zone, pageId, scroll )
 end
 
 function WWG.CreatePage( zone, skipBuilding, refreshTree )
-	if not WW.pages[ zone.tag ] then
-		WW.pages[ zone.tag ] = {}
-		WW.pages[ zone.tag ][ 0 ] = {}
-		WW.pages[ zone.tag ][ 0 ].selected = 1
-	end
+	WW.pages[zone.tag] = WW.pages[zone.tag] or {}
+	WW.pages[zone.tag][0] = WW.pages[zone.tag][0] or {}
+	WW.pages[zone.tag][0][WW.currentCharacterId] = WW.pages[zone.tag][0][WW.currentCharacterId] or WW.pages[zone.tag][0].selected or 1
 
-	local nextPageId = #WW.pages[ zone.tag ] + 1
-	WW.pages[ zone.tag ][ nextPageId ] = {
+	local nextPageId = #WW.pages[zone.tag] + 1
+	WW.pages[zone.tag][nextPageId] = {
 		name = string.format( GetString( WW_PAGE ), tostring( nextPageId ) ),
 	}
 
-	WW.pages[ zone.tag ][ 0 ].selected = nextPageId
 	WW.selection.pageId = nextPageId
 
 	WWG.CreateDefaultSetups( zone, nextPageId )
@@ -1345,7 +1345,6 @@ function WWG.DeletePage()
 	local nextPageId = pageId - 1
 	if nextPageId < 1 then nextPageId = pageId end
 
-	WW.pages[ zone.tag ][ 0 ].selected = nextPageId
 	WW.selection.pageId = nextPageId
 
 	table.remove( WW.setups[ zone.tag ], pageId )
@@ -1383,7 +1382,6 @@ function WWG.PageLeft()
 	end
 	local prevPage = WW.selection.pageId - 1
 	WW.selection.pageId = prevPage
-	WW.pages[ WW.selection.zone.tag ][ 0 ].selected = prevPage
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 end
 
@@ -1393,7 +1391,6 @@ function WWG.PageRight()
 	end
 	local nextPage = WW.selection.pageId + 1
 	WW.selection.pageId = nextPage
-	WW.pages[ WW.selection.zone.tag ][ 0 ].selected = nextPage
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 end
 
