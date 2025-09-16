@@ -237,7 +237,8 @@ function WW.LoadSkills( setup )
 				return WW.IsReadyToSwap()
 			end ):Then( function()
 				-- check if cryptcanon gets changed
-				if slotIndex == 8 and WW.HasCryptCanon() and gearTable[ EQUIP_SLOT_CHEST ].id == 194509 and not movedCryptCanon then
+				local chestSlot = gearTable[ EQUIP_SLOT_CHEST ]
+				if slotIndex == 8 and WW.HasCryptCanon() and chestSlot and chestSlot.id == 194509 and not movedCryptCanon then
 					logger:Debug( "Unequip cryptcanon" )
 					local equippedLink = GetItemLink( BAG_WORN, EQUIP_SLOT_CHEST, LINK_STYLE_DEFAULT )
 
