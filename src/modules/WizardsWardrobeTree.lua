@@ -171,7 +171,7 @@ end
 
 
 local function treeEntrySetup( node, control, data, open )
-    local pages = WizardsWardrobeSV.Default[GetDisplayName()][WW.storage.selectedCharacterId].pages[data.tag]
+		local pages = WW.pages[ data.tag ]
     local t = {}
     if not control.icon then
         control.icon = WINDOW_MANAGER:CreateControl( control:GetName() .. "Icon", control, CT_TEXTURE )
@@ -204,6 +204,7 @@ local function treeEntrySetup( node, control, data, open )
         end )
     end
 end
+
 
 local function treeEntry_OnMouseUp( self, upInside )
     ZO_TreeEntry_OnMouseUp( self, upInside )
@@ -321,6 +322,8 @@ local function createTree()
     tree:Commit()
     tree:SetExclusive( true )
 end
+
+
 
 function WWT:Initialize()
     logger:Debug( "Initializing Tree" )
