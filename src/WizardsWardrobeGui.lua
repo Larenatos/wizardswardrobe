@@ -39,6 +39,7 @@ function WWG.Init()
 	WWG.SetupBottomMenu()
 	WWG.CreateSetupPool()
 	WWG.SetupTopMenu()
+	WWG.SetupCharacterDropdown()
 
 	WWG.SetupModifyDialog()
 	WWG.SetupArrangeDialog()
@@ -102,6 +103,7 @@ function WWG.HandleFirstStart()
 	end
 	if not PlainStringFind( string.lower( WW.version ), "beta" ) then
 		if highestMajor < currentMajor or (highestMajor == currentMajor and highestMinor < currentMinor) then
+			WWG.HandleMigration()
 			EVENT_MANAGER:RegisterForUpdate( WWG.name .. "UpdateWarning", 1000,
 			function()
 				if not ZO_Dialogs_IsShowingDialog() then
@@ -116,6 +118,19 @@ function WWG.HandleFirstStart()
 					end )
 				end
 			end )
+		end
+	end
+end
+
+function WWG.HandleMigration()
+	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
+		if characterId ~= "$AccountWide" then
+			for _, pages in pairs(characterSv.pages) do
+				pages[0] = {[characterId] = pages[0].selected}
+			end
+			characterSv.selectedZoneTag = {
+				[characterId] = characterSv.selectedZoneTag,
+			}
 		end
 	end
 end
@@ -423,6 +438,10 @@ function WWG.OnWindowResize( action )
 		WizardsWardrobeWindowBottomDivider:SetWidth( width )
 		
 		WizardsWardrobeWindowPageMenuPagesDropdownSelectedItemText:SetDimensionConstraints(140, 0, width - 200, 29)
+
+		local characterDropdownMaxWidth = width/2-70
+		local characterDropdownMinWidth = characterDropdownMaxWidth < 140 and characterDropdownMaxWidth or 140
+		WizardsWardrobeWindowBottomMenuCharacterDropdown:SetDimensionConstraints( characterDropdownMinWidth, 0,characterDropdownMaxWidth, 20 )
 	end
 
 	local function OnResizeEnd()
@@ -508,7 +527,7 @@ function WWG.SetupTopMenu()
 
 	WizardsWardrobeWindowTopMenuButtonsAddPage:SetHandler( "OnClicked", function( self )
 		local DO_REFRESH_TREE = true
-		WWG.CreatePage( WW.selection.zone, false, DO_REFRESH_TREE )
+		WWG.CreatePage(false, DO_REFRESH_TREE)
 	end )
 	WWG.SetTooltip( WizardsWardrobeWindowTopMenuButtonsAddPage, TOP, GetString( WW_BUTTON_ADDPAGE ) )
 
@@ -539,18 +558,16 @@ end
 
 function WWG.OnZoneSelect( zone )
 	if (WW.currentZoneId ~= 0) then
-		WW.storage.selectedZoneTag = zone.tag
-	end
-	
-	PlaySound( SOUNDS.TABLET_PAGE_TURN )
-	local node = WWG.tree.tree:GetTreeNodeByData( zone )
-	if not WW.pages[ zone.tag ] then
-		local DO_NOT_REFRESH_TREE = false
-		WWG.CreatePage( zone, true, DO_NOT_REFRESH_TREE )
+		WW.storage.selectedZoneTag[WW.storage.selectedCharacterId] = zone.tag
 	end
 
 	WW.selection.zone = zone
-	WW.selection.pageId = WW.pages[ zone.tag ][ 0 ].selected
+	PlaySound(SOUNDS.TABLET_PAGE_TURN)
+	local node = WWG.tree.tree:GetTreeNodeByData(zone)
+	if not WW.pages[zone.tag] then
+		local DO_NOT_REFRESH_TREE = false
+		WWG.CreatePage(true, DO_NOT_REFRESH_TREE)
+	end
 
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId )
 
@@ -631,7 +648,6 @@ function WWG.SetupPagesDropdown()
 		if pageId ~= 0 then
 			entry = comboBox:CreateItemEntry(page.name, function() 
 					WW.selection.pageId = pageId
-					WW.pages[ WW.selection.zone.tag ][ 0 ].selected = pageId
 					WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 				end
 			)
@@ -1282,11 +1298,12 @@ function WWG.BuildPage( zone, pageId, scroll )
 	end
 end
 
-function WWG.CreatePage( zone, skipBuilding, refreshTree )
-	if not WW.pages[ zone.tag ] then
-		WW.pages[ zone.tag ] = {}
-		WW.pages[ zone.tag ][ 0 ] = {}
-		WW.pages[ zone.tag ][ 0 ].selected = 1
+function WWG.CreatePage(skipBuilding, refreshTree)
+	local zone = WW.selection.zone
+	if not WW.pages[zone.tag] then
+		WW.pages[zone.tag] = {}
+		WW.pages[zone.tag][0] = {}
+		WW.pages[zone.tag][0][WW.currentCharacterId] = 1
 	end
 
 	local nextPageId = #WW.pages[ zone.tag ] + 1
@@ -1294,7 +1311,6 @@ function WWG.CreatePage( zone, skipBuilding, refreshTree )
 		name = string.format( GetString( WW_PAGE ), tostring( nextPageId ) ),
 	}
 
-	WW.pages[ zone.tag ][ 0 ].selected = nextPageId
 	WW.selection.pageId = nextPageId
 
 	WWG.CreateDefaultSetups( zone, nextPageId )
@@ -1349,7 +1365,6 @@ function WWG.DeletePage()
 	local nextPageId = pageId - 1
 	if nextPageId < 1 then nextPageId = pageId end
 
-	WW.pages[ zone.tag ][ 0 ].selected = nextPageId
 	WW.selection.pageId = nextPageId
 
 	table.remove( WW.setups[ zone.tag ], pageId )
@@ -1387,7 +1402,6 @@ function WWG.PageLeft()
 	end
 	local prevPage = WW.selection.pageId - 1
 	WW.selection.pageId = prevPage
-	WW.pages[ WW.selection.zone.tag ][ 0 ].selected = prevPage
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 end
 
@@ -1397,7 +1411,6 @@ function WWG.PageRight()
 	end
 	local nextPage = WW.selection.pageId + 1
 	WW.selection.pageId = nextPage
-	WW.pages[ WW.selection.zone.tag ][ 0 ].selected = nextPage
 	WWG.BuildPage( WW.selection.zone, WW.selection.pageId, true )
 end
 
@@ -1942,5 +1955,65 @@ function WWG.HandleExitWarning()
 		quitControl:SetMouseEnabled(true)
 		WizardsWardrobeLogoutWarning:SetHidden(true)
 		WizardsWardrobeQuitWarning:SetHidden(true)
+	end
+end
+
+function WWG.SetupCharacterDropdown()
+	local comboBox = ZO_ComboBox_ObjectFromContainer(WizardsWardrobeWindowBottomMenuCharacterDropdown)
+	comboBox:SetSortsItems(false)
+	WizardsWardrobeWindowBottomMenuCharacterDropdown.comboBox = comboBox
+
+	comboBox:ClearItems()
+	local orderedCharInfo = {}
+	local savedVariables = WizardsWardrobeSV.Default[GetDisplayName()]
+	for i = 1, GetNumCharacters() do
+		local name, _, _, _, _, _, id, _ = GetCharacterInfo(i)
+		if not savedVariables[id] then
+			savedVariables[id] = WW.DefaultSavedVariables(id)
+			savedVariables[id]["$LastCharacterName"] = name:sub(1, -4)
+		end
+		table.insert(orderedCharInfo, {characterId = id, characterSv = savedVariables[id]})
+	end
+	table.insert(orderedCharInfo, {characterId = "$AccountWide", characterSv = savedVariables["$AccountWide"]})
+
+	for _, charInfo in ipairs(orderedCharInfo) do
+		local characterId = charInfo.characterId
+		local characterSv = charInfo.characterSv
+		local characterName = savedVariables[characterId]["$LastCharacterName"] or "Account Wide"
+
+		local entry = comboBox:CreateItemEntry(characterName, function()
+			local selectedCharacterSv
+			if characterId == "$AccountWide" then
+				selectedCharacterSv = savedVariables[characterId].accountWideStorage
+			else
+				selectedCharacterSv = savedVariables[characterId]
+			end
+			WW.setups = selectedCharacterSv.setups
+			WW.pages = selectedCharacterSv.pages
+			WW.prebuffs = selectedCharacterSv.prebuffs
+
+			WW.storage.selectedCharacterId = characterId
+			if not WW.storage.selectedZoneTag[characterId] then
+				WW.storage.selectedZoneTag[characterId] = "GEN"
+			end
+			WW.selection.zone = WW.zones[WW.storage.selectedZoneTag[characterId]]
+
+			WW.gui.tree:RefreshTree( WW.gui.tree.tree, WW.selection.zone )
+
+			WWG.OnZoneSelect(WW.selection.zone)
+		end)
+		comboBox:AddItem(entry)
+
+		if characterId == GetCurrentCharacterId() then
+			if characterSv.selectedCharacterId then
+				if characterSv.selectedCharacterId == "$AccountWide" then
+					comboBox:SetSelectedItem("Account Wide")
+				else
+					comboBox:SetSelectedItem(savedVariables[characterSv.selectedCharacterId]["$LastCharacterName"])
+				end
+			else
+				comboBox:SetSelectedItem(characterName)
+			end
+		end
 	end
 end

@@ -171,7 +171,7 @@ end
 
 
 local function treeEntrySetup( node, control, data, open )
-    local pages = WW.pages[ data.tag ]
+		local pages = WW.pages[ data.tag ]
     local t = {}
     if not control.icon then
         control.icon = WINDOW_MANAGER:CreateControl( control:GetName() .. "Icon", control, CT_TEXTURE )
