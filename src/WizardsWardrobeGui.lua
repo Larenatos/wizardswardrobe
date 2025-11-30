@@ -1914,7 +1914,7 @@ function WWG.StartAlphaAnimation( control, duration, startAlpha, endAlpha )
 end
 
 function WWG.HandleExitWarning()
-	if not WW.settings.showExitWarnings then
+	if not WW.settings.showExitWarnings or WW.storage.disableWarningForCurrentCharacter then
 		if WizardsWardrobeLogoutWarning then
 			WizardsWardrobeLogoutWarning:GetParent():SetMouseEnabled(true)
 			WizardsWardrobeLogoutWarning:SetHidden(true)

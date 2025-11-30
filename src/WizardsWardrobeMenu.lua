@@ -37,6 +37,7 @@ function WW.DefaultSavedVariables(characterId)
 			[characterId] = "GEN",
 		},
 		selectedCharacterId = characterId,
+    disableWarningForCurrentCharacter = false,
 	}
 end
 
@@ -200,6 +201,13 @@ function WWM.InitAM()
 			getFunc = function() return WW.settings.showExitWarnings end,
 			setFunc = function( value ) WW.settings.showExitWarnings = value end,
 			tooltip = GetString( WW_MENU_SHOWEXITWARNINGS_TT ),
+		},
+    {
+			type = "checkbox",
+			name = GetString( WW_MENU_DISABLE_WARNING_FOR_CURRENT_CHARACTER ),
+			getFunc = function() return WW.storage.disableWarningForCurrentCharacter end,
+			setFunc = function( value ) WW.storage.disableWarningForCurrentCharacter = value end,
+			tooltip = GetString( WW_MENU_DISABLE_WARNING_FOR_CURRENT_CHARACTER_TT ),
 		},
 		{
 			type = "checkbox",
