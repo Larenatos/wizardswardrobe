@@ -4,6 +4,8 @@ local WW = WizardsWardrobe
 WW.gui = WW.gui or {}
 local WWG = WW.gui
 
+local logger = LibDebugLogger( WW.name )
+
 local PANEL_WIDTH = 245
 local PANEL_HEIGHT = 70
 local PANEL_WIDTH_MINI = PANEL_WIDTH - 70
@@ -140,9 +142,12 @@ function WWG.SetSceneManagement()
 		local sceneName = scene:GetName()
 
 		if sceneName == "gameMenuInGame" then
-			if newState == SCENE_SHOWN then WWG.HandleExitWarning()
+			if newState == SCENE_SHOWN then WWG.HandleExitWarning(false)
 			else return end
-		end
+		else if sceneName == "mainMenuGamepad" then
+      if newState == SCENE_SHOWN then WWG.HandleExitWarning(true)
+      else return end
+    end end
 				
 
 		if newState == SCENE_SHOWING then
@@ -1913,7 +1918,7 @@ function WWG.StartAlphaAnimation( control, duration, startAlpha, endAlpha )
 	return animation, timeline
 end
 
-function WWG.HandleExitWarning()
+function WWG.HandleExitWarning( isGamepad )
 	if not WW.settings.showExitWarnings or WW.storage.disableWarningForCurrentCharacter then
 		if WizardsWardrobeLogoutWarning then
 			WizardsWardrobeLogoutWarning:GetParent():SetMouseEnabled(true)
@@ -1925,6 +1930,23 @@ function WWG.HandleExitWarning()
 		end
 		return
 	end
+  
+  if isGamepad then
+    local gamepadLogoutControl = WINDOW_MANAGER:GetControlByName("ZO_LogoutDialog_GamepadDailyRewardTile")
+
+    if WizardsWardrobeLogoutGamepadWarning == nil and WizardsWardrobeGemapadQuitWarning == nil then
+      WINDOW_MANAGER:CreateControlFromVirtual("WizardsWardrobeLogoutGamepadWarning", gamepadLogoutControl, "WizardsWardrobeWarningGampead")
+      WizardsWardrobeLogoutGamepadWarning:SetText(GetString(WW_EXITWARNING_GAMEPAD_TT))
+      WizardsWardrobeLogoutGamepadWarning:SetHidden(true)
+	  end
+    local accountWideSavedGear = WW.banking.GetAccountSavedGearInInventory(true)
+    if next(accountWideSavedGear) ~= nil then
+      WizardsWardrobeLogoutGamepadWarning:SetHidden(false)
+    else
+      WizardsWardrobeLogoutGamepadWarning:SetHidden(true)
+    end
+    return
+  end
 
 	local menu = WINDOW_MANAGER:GetControlByName("ZO_GameMenu_InGame").gameMenu
 	local logoutControl

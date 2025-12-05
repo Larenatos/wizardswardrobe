@@ -183,6 +183,7 @@ local language = {
 	WW_BUTTON_BUFFFOOD =
 	"No buff food saved!\nPress |cFFFFFF[Shift + Click]|r to save current food or drag & drop food onto this button.",
 	WW_BUTTON_EXITWARNING_TT = "You have gear in this character's inventory that is saved in other character's Wizard's setups. Click to continue anyways",
+	WW_EXITWARNING_GAMEPAD_TT = "You have gear in this character's inventory that is saved in other character's Wizard's setups. You can press Y to exit anyways.",
 	WW_RENAME_PAGE = "Enter new name for page:",
 	WW_DELETEPAGE_WARNING = "Really delete page [%s]?",
 	WW_OVERWRITESETUP_WARNING = "Really overwrite setup [%s]?",

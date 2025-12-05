@@ -1107,6 +1107,29 @@ function WW.Init()
 	WW.currentCharacterId = GetCurrentCharacterId()
 end
 
+local originalLogout = Logout
+Logout = function()
+  local accountWideSavedGear = WW.banking.GetAccountSavedGearInInventory(true)
+  if next(accountWideSavedGear) ~= nil then
+    return
+  else
+    originalLogout()
+  end
+end
+
+function OnGamepadInput( eventCode, button, state )
+  if IsGamepadInputActive() and eventCode == "OnGamepadButtonPressed" then
+    -- local currentScene = SCENE_MANAGER:GetCurrentScene()
+    -- local isLogoutWindow = currentScene and (currentScene:GetName() == "logoutDialogGamepad")
+
+    if button == GAMEPAD_ACTION_BUTTON_Y then
+      originalLogout()
+    end
+  end
+end
+
+EVENT_MANAGER:RegisterForEvent( WW.name, EVENT_GAMEPAD_INPUT, OnGamepadInput )
+
 function WW.OnAddOnLoaded( _, addonName )
 	if addonName ~= WW.name then return end
 

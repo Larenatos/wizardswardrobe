@@ -459,5 +459,10 @@
 			<OnMouseDown>self:GetParent().callback()</OnMouseDown>
 		</Texture>
 
+    <Label name="WizardsWardrobeWarningGampead" font="ZoFontGamepadCondensed42" color="FF0000" virtual="true">
+        <Anchor point="TOPLEFT" relativeTo="$(parent)" relativePoint="BOTTOMLEFT" offsetY="20" offsetX="-20"/>
+        <Anchor point="TOPRIGHT" relativeTo="$(parent)" relativePoint="BOTTOMRIGHT" offsetY="20" offsetX="20" />
+    </Label>
+
 	</Controls>
 </GuiXml>
