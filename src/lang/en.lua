@@ -80,6 +80,10 @@ local language = {
 	WW_MENU_INVENTORYMARKER_TT = "Shows a small icon over items in the inventory that are saved in setups.",
 	WW_MENU_LOCKSAVEDGEAR = "Lock saved gear",
 	WW_MENU_LOCKSAVEDGEAR_TT = "Automatically locks gear when saved to a setup.",
+  WW_MENU_SHOWEXITWARNINGS = "Show log out and quit warning",
+  WW_MENU_SHOWEXITWARNINGS_TT = "Show a warning icon next to Logout and Quit when there is gear in the current characters inventory which are used for setups on other characters setups. Requires now to click the warning icon instead the text to log out and quit.",
+  WW_MENU_DISABLE_WARNING_FOR_CURRENT_CHARACTER = "Disable exit warning for current character",
+  WW_MENU_DISABLE_WARNING_FOR_CURRENT_CHARACTER_TT = "Disables the log out and quit warning for the current character",
 	WW_MENU_UNEQUIPEMPTY = "Unequip empty slots",
 	WW_MENU_UNEQUIPEMPTY_TT =
 	"If something is saved as empty in the setup, the item/champion point/skill will be unequipped.",
@@ -178,6 +182,7 @@ local language = {
 	WW_BUTTON_CP = "No CPs saved!\nPress |cFFFFFF[Shift + Click]|r to save current slottables.",
 	WW_BUTTON_BUFFFOOD =
 	"No buff food saved!\nPress |cFFFFFF[Shift + Click]|r to save current food or drag & drop food onto this button.",
+	WW_BUTTON_EXITWARNING_TT = "You have gear in this character's inventory that is saved in other character's Wizard's setups. Click to continue anyways",
 	WW_RENAME_PAGE = "Enter new name for page:",
 	WW_DELETEPAGE_WARNING = "Really delete page [%s]?",
 	WW_OVERWRITESETUP_WARNING = "Really overwrite setup [%s]?",

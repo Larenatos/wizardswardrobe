@@ -116,19 +116,20 @@ function WWB.DepositSetup(zone, pageId, index)
 	WWB.MoveItems(gearTable, bankBag)
 end
 
-function WWB.DepositAllSetups(skipCurrentCharacter)
-	local bankBag = GetBankingBag()
-	if WW.DISABLEDBAGS[bankBag] then return end
-	
+function WWB.GetAccountSavedGearInInventory(skipCurrentCharacter)
 	local itemLocationTable = WW.GetItemLocation()
 	local preGearTable = {}
-	WW.Log(GetString(WW_MSG_DEPOSIT_ALL), WW.LOGTYPES.NORMAL, "FFFFFF")
-	
+
 	for characterId, characterSv in pairs(WizardsWardrobeSV.Default[GetDisplayName()]) do
-		if characterId ~= "$AccountWide" then		
-			for zoneTag, setupPages in pairs(characterSv.setups) do
+		if not skipCurrentCharacter or characterSv["$LastCharacterName"] ~= GetUnitName("player") then
+			local SVsetups
+			if characterId == "$AccountWide" then
+				SVsetups = characterSv.accountWideStorage.setups
+			else
+				SVsetups = characterSv.setups
+			end
+			for zoneTag, setupPages in pairs(SVsetups) do
 				for pageId, setups in pairs(setupPages) do
-					
 					for _, setup in ipairs( setups ) do
 						if setup.gear then
 							for __, gearSlot in ipairs(WW.GEARSLOTS) do
@@ -152,6 +153,15 @@ function WWB.DepositAllSetups(skipCurrentCharacter)
 			end
 		end
 	end
+	return preGearTable
+end
+
+function WWB.DepositAllSetups()
+	local bankBag = GetBankingBag()
+	if WW.DISABLEDBAGS[bankBag] then return end
+	
+	WW.Log(GetString(WW_MSG_DEPOSIT_ALL), WW.LOGTYPES.NORMAL, "FFFFFF")
+	local preGearTable = WWB.GetAccountSavedGearInInventory()
 	
 	local gearTable = {}
 	for id, item in pairs(preGearTable) do
